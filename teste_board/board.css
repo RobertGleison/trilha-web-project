@@ -1,0 +1,303 @@
+header h1 {
+    font-size: 70px;
+    color: black; /* Cor do texto */
+    text-shadow: 
+        2px 2px 0 rgb(249, 249, 248),
+       -2px 2px 0 rgb(249, 249, 248),
+        2px -2px 0 rgb(249, 249, 248),
+       -2px -2px 0 rgb(249, 249, 248);
+}
+
+#title {
+    font-size: larger;
+}
+
+body {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    text-align: center;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("./bck_page.jpg");
+    background-size: cover;
+}
+#board {
+    position: relative;
+    height: 650px;
+    width: 650px;
+    background: url("./n_board.jpg");
+    background-size: contain;
+    border-color: rgb(234, 236, 238);
+    border-width: 3px;
+    border-style: solid;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+
+} 
+    #board #b10{
+        position: absolute;
+        top: 30px;  
+        left: 42px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b11{
+        position: absolute;
+        top: 30px;  
+        left: 295px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+
+    #board #b12{
+        position: absolute;
+        top: 30px;  
+        left: 547px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+
+    #board #b20{
+        position: absolute;
+        top: 110px;  
+        left: 125px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b21{
+        position: absolute;
+        top: 105px;  
+        left: 295px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+
+    #board #b22{
+        position: absolute;
+        top: 110px;  
+        left: 470px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+
+    #board #b30{
+        position: absolute;
+        top: 190px;  
+        left: 200px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b31{
+        position: absolute;
+        top: 185px;  
+        left: 297px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b32{
+        position: absolute;
+        top: 190px;  
+        left: 395px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b40{
+        position: absolute;
+        top: 285px;  
+        left: 42px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b41{
+        position: absolute;
+        top: 285px;  
+        left: 117px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b42{
+        position: absolute;
+        top: 285px;  
+        left: 190px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b43{
+        position: absolute;
+        top: 285px;  
+        left: 400px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b44{
+        position: absolute;
+        top: 285px;  
+        left: 475px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b45{
+        position: absolute;
+        top: 285px;  
+        left: 552px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b50{
+        position: absolute;
+        top: 385px;  
+        left: 200px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b51{
+        position: absolute;
+        top: 390px;  
+        left: 297px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b52{
+        position: absolute;
+        top: 385px;  
+        left: 395px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+    }
+    #board #b60{
+        position: absolute;
+        top: 465px;  
+        left: 125px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b61{
+        position: absolute;
+        top: 465px;  
+        left: 297px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+
+    #board #b62{
+        position: absolute;
+        top: 465px;  
+        left: 470px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b70{
+        position: absolute;
+        top: 540px;  
+        left: 42px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+    #board #b71{
+        position: absolute;
+        top: 540px;  
+        left: 295px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
+
+    #board #b72{
+        position: absolute;
+        top: 540px;  
+        left: 547px;
+        width: 50px;
+        height: 50px;
+        color: black;
+        border-style: solid;
+        border-radius: 40%;
+
+    }
