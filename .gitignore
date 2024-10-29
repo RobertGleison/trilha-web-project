@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+
+# IDE - VSCode
+.vscode/
+
+# IDE - JetBrains (WebStorm, IntelliJ, etc)
+.idea/
+
+# Build output
+dist/
+build/
+public/
+
+# Temporary files
+.cache/
