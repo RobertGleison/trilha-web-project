@@ -194,3 +194,112 @@ class NotFoundView extends View {
         });
     }
 }
+
+
+class GameView extends View {
+    render() {
+        return `
+            <div class="game-container">
+                <header>
+                    <h1>Nine Man Morris</h1>
+                    <button id="backToMenu">Back to Menu</button>
+                </header>
+                <div id="container">
+                    <div class="piece-container" id="red-pieces"></div>
+                    <div id="board"></div>
+                    <div class="piece-container" id="black-pieces"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    initialize() {
+        // Setup back button handler
+        document.getElementById('backToMenu').addEventListener('click', () => {
+            this.router.navigate('/menu');
+        });
+
+        // Get game settings from localStorage
+        const gameSettings = JSON.parse(localStorage.getItem('gameSettings') || '{}');
+        
+        // Initialize the board
+        this.initializeBoard(gameSettings);
+    }
+
+    initializeBoard(settings) {
+        const n = settings.boardSize === 'large' ? 5 : 4; // 5 for large, 4 for standard
+        this.createSquares(n);
+        const numPieces = 3 * n;
+        this.setupPieces("red-pieces", "../assets/red_piece.png", numPieces);
+        this.setupPieces("black-pieces", "../assets/black_piece.png", numPieces);
+    }
+
+    createSquares(n) {
+        const board = document.getElementById('board');
+        const initialSize = 125;
+        const sizeIncrement = 125;
+        var game_list = [];
+
+        for (let i = 0; i < n; i++) {
+            const size = initialSize + i * sizeIncrement;
+            const square = document.createElement('div');
+            square.classList.add('square');
+            square.style.width = `${size}px`;
+            square.style.height = `${size}px`;
+            square.style.left = `calc(50% - ${size / 2}px)`;
+            square.style.top = `calc(50% - ${size / 2}px)`;
+
+            const createButton = (i, x, y) => {
+                const button = document.createElement('div');
+                button.id = i.toString().concat(x.toString().concat(y.toString()));
+                button.classList.add('button');
+                button.style.left = `${x}px`;
+                button.style.top = `${y}px`;
+                square.appendChild(button);
+                button.addEventListener('click', this.handleTileClick.bind(this));
+            };
+
+            const halfSize = size / 2;
+            createButton(i, 0, 0);
+            createButton(i, size, 0);
+            createButton(i, 0, size);
+            createButton(i, size, size);
+            createButton(i, halfSize, 0);
+            createButton(i, halfSize, size);
+            createButton(i, 0, halfSize);
+            createButton(i, size, halfSize);
+
+            board.appendChild(square);
+            game_list.push(['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty']);
+        }
+    }
+
+    setupPieces(playerId, pieceImage, count) {
+        const container = document.getElementById(playerId);
+        for (let i = 0; i < count; i++) {
+            const piece = document.createElement("img");
+            piece.src = pieceImage;
+            piece.classList.add("piece");
+            container.appendChild(piece);
+        }
+    }
+
+    handleTileClick(event) {
+        console.log(event.target.id);
+        // Add your game logic here
+    }
+
+    cleanup() {
+        // Remove event listeners
+        const backButton = document.getElementById('backToMenu');
+        if (backButton) {
+            backButton.removeEventListener('click', () => {});
+        }
+
+        // Clean up board buttons
+        const buttons = document.querySelectorAll('.button');
+        buttons.forEach(button => {
+            button.removeEventListener('click', this.handleTileClick);
+        });
+    }
+}

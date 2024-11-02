@@ -9,6 +9,9 @@ const routes = {
     '/new-game': {
         view: GameSetupView
     },
+    '/game': {
+        view: GameView
+    },
     '/ranking': {
         view: class extends TextView {
             constructor() {

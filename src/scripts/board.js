@@ -1,42 +1,63 @@
-accessibility. You can choose to enable a more compact line height from the view settings menu.
-‎teste_board/board.js
-+41
-Original file line number	Original file line	Diff line number	Diff line change
-@@ -0,0 +1,41 @@
-const NEIGHBOR_TABLE = [[B10,B11],[B10,B40],[B11,B21],
-[B11,B12],[B12,B45],[B20,B41],[B20,B21],[B21,B31]
-[B21,B22],[B22,B44],[B30,B42],[B30,B31],[B31,B32]
-[B32,B43], [B40,B70],[B40,B41],[B41,B60],[B41,B42],
-[B42,B50],[B43,B52],[B44,B62],[B44,B45],[B50,B51],
-[B51,B52], [B51,B61],[B60,B61],[B61,B62],[B61,B71],
-[B70,B71], [B71,B72]]
-const MILL_TABLE = [[B10,B11,B12],[B10,B40,B70],[B11,B21,B31],
-[B12,B45,B72],[B20,B21,B22],[B20,B41,B60],[B22,B44,B62],
-[B30,B31,B32],[B30,B42,B50],[B32,B43,B52],[B40,B41,B42],
-[B43,B44,B45],[B50,B51,B52], [B51,B61,B71],[B60,B61,B62]
-[B70,B71,B72]]
-window.onload = function() {
-    setBoard();
-}
-function setBoard(){ 
-    for (let x = 1; x < 8; x++){
-        if(x == 4){
-            for (let y = 0; y < 7; y++){
-                let tile = document.createElement("div");
-                tile.id = "b".concat(x.toString().concat(y.toString()));
-                tile.addEventListener("click", selectTile);
-                board.appendChild(tile);
-            }
-            continue;
-        }
-        for (let y = 0; y < 3; y++){
-            let tile = document.createElement("div");
-            tile.id = "b".concat(x.toString().concat(y.toString()));
-            tile.addEventListener("click", selectTile);
-            board.appendChild(tile);
-        }
+function createSquares(n) {
+    const board = document.getElementById('board');
+    const initialSize = 125;
+    const sizeIncrement = 125;
+    var game_list = [];
+    
+    for (let i = 0; i < n; i++) {
+      const size = initialSize + i * sizeIncrement;
+      const square = document.createElement('div');
+      square.classList.add('square');
+      square.style.width = `${size}px`;
+      square.style.height = `${size}px`;
+      square.style.left = `calc(50% - ${size / 2}px)`;
+      square.style.top = `calc(50% - ${size / 2}px)`;
+  
+      // Function to create button centered at (x, y) relative to the square
+      function createButton(i, x , y) {
+        const button = document.createElement('div');
+        button.id = i.toString().concat(x.toString().concat(y.toString()));
+        button.classList.add('button');
+        button.style.left = `${x}px`;
+        button.style.top = `${y}px`;
+        square.appendChild(button);
+        button.addEventListener('click', selectTile);
+      }
+  
+      // Place buttons centered on edges and vertices of the square
+      const halfSize = size / 2;
+      createButton(i, 0, 0);                // Top-left corner
+      createButton(i, size, 0);              // Top-right corner
+      createButton(i, 0, size);              // Bottom-left corner
+      createButton(i, size, size);           // Bottom-right corner
+      createButton(i, halfSize, 0);          // Top-center
+      createButton(i, halfSize, size);       // Bottom-center
+      createButton(i, 0, halfSize);          // Left-center
+      createButton(i, size, halfSize);       // Right-center
+  
+      board.appendChild(square);
+      game_list.push(['empty','empty','empty','empty','empty','empty','empty','empty']);
     }
-}
-function selectTile() {
-    console.log(this.id)
-}
+  }
+  
+  function setupPieces(playerId, pieceImage, count) {
+    const container = document.getElementById(playerId);
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement("img");
+      piece.src = pieceImage;
+      piece.classList.add("piece");
+      container.appendChild(piece);
+    }
+  }
+  
+  function selectTile() {
+    console.log(this.id);
+  }
+  
+  // Run the function with a specified number of squares
+  const n = 4;
+  createSquares(n);
+  const numPieces = 3 * n;
+  setupPieces("red-pieces", "../assets/red_piece.png", numPieces);
+  setupPieces("black-pieces", "../assets/black_piece.png", numPieces);
+  
