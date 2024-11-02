@@ -78,8 +78,8 @@ function initializeGame() {
     const n = 4;
     createSquares(n);
     const numPieces = 3 * n;
-    setupPieces("red-pieces", "../assets/red_piece.png", numPieces);
-    setupPieces("black-pieces", "../assets/black_piece.png", numPieces);
+    setupPieces("red-pieces", "assets/red_piece.png", numPieces);
+    setupPieces("black-pieces", "assets/black_piece.png", numPieces);
 }
 
 // Export the initialization function
