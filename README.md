@@ -55,7 +55,7 @@ Before you begin, ensure you have the following installed:
 
 3. **Start the server**
    ```bash
-   npm start
+   node server.js
    ```
 
 4. **Open the game**

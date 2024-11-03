@@ -130,12 +130,14 @@ class GameSetupView extends View {
     }
 
     initialize() {
+        // Game mode change handler
         document.getElementById('gameMode').addEventListener('change', (e) => {
             const difficultyGroup = document.getElementById('difficultyGroup');
             difficultyGroup.style.display = e.target.value === 'pvc' ? 'flex' : 'none';
         });
 
-        document.getElementById('gameSetupForm').addEventListener('submit', (e) => {
+        // Form submission handler
+        document.getElementById('gameSetupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const gameSettings = {
                 gameMode: document.getElementById('gameMode').value,
@@ -144,11 +146,12 @@ class GameSetupView extends View {
                 firstPlayer: document.getElementById('firstPlayer').value
             };
             localStorage.setItem('gameSettings', JSON.stringify(gameSettings));
-            this.router.navigate('/game');
+            navigateTo('/game');
         });
 
+        // Back button handler
         document.getElementById('backBtn').addEventListener('click', () => {
-            this.router.navigate('/menu');
+            navigateTo('/');
         });
     }
 }
