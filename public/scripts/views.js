@@ -1,4 +1,4 @@
-import { navigateTo } from './router.js';
+import { navigateTo } from "./router.js";
 
 class BaseView {
   constructor() {}
@@ -21,18 +21,20 @@ class BaseView {
   }
 }
 
-
 const WithBackButton = {
-    addBackButtonListener() {
-        const backBtn = document.getElementById("backBtn");
-        if (backBtn) {
-            backBtn.addEventListener("click", (e) => {
-                e.preventDefault();
-                navigateTo("/");
-            });
-        }
+  addBackButtonListener() {
+    const backBtn = document.getElementById("backBtn");
+    if (backBtn) {
+      backBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigateTo("/");
+      });
     }
+  },
 };
+
+class LoginView extends BaseView
+
 
 
 class HowToPlayView extends BaseView {
@@ -123,9 +125,8 @@ class HowToPlayView extends BaseView {
 
   initialize() {
     WithBackButton.addBackButtonListener.call(this);
+  }
 }
-}
-
 
 class RulesView extends BaseView {
   constructor() {
@@ -185,20 +186,20 @@ class RulesView extends BaseView {
             </div>
         `;
   }
-  
+
   initialize() {
     WithBackButton.addBackButtonListener.call(this);
-}
+  }
 }
 
 class GameView extends BaseView {
-    constructor() {
-        super();
-        this.setTitle("Game");
-    }
+  constructor() {
+    super();
+    this.setTitle("Game");
+  }
 
-    async getHtml() {
-        return `
+  async getHtml() {
+    return `
             <div class="setup-container">
                 <h2 id="gameSetupTitle">Game Setup</h2>
                 <form id="gameSetupForm" class="setup-form">
@@ -239,108 +240,113 @@ class GameView extends BaseView {
                 </form>
             </div>
         `;
+  }
+
+  initialize() {
+    // Game mode change handler
+    const gameModeSelect = document.getElementById("gameMode");
+    if (gameModeSelect) {
+      gameModeSelect.addEventListener("change", (e) => {
+        const difficultyGroup = document.getElementById("difficultyGroup");
+        difficultyGroup.style.display =
+          e.target.value === "pvc" ? "flex" : "none";
+      });
     }
 
-    initialize() {
-        // Game mode change handler
-        const gameModeSelect = document.getElementById("gameMode");
-        if (gameModeSelect) {
-            gameModeSelect.addEventListener("change", (e) => {
-                const difficultyGroup = document.getElementById("difficultyGroup");
-                difficultyGroup.style.display = e.target.value === "pvc" ? "flex" : "none";
-            });
-        }
+    // Form submission handler
+    const gameSetupForm = document.getElementById("gameSetupForm");
+    if (gameSetupForm) {
+      gameSetupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-        // Form submission handler
-        const gameSetupForm = document.getElementById("gameSetupForm");
-        if (gameSetupForm) {
-            gameSetupForm.addEventListener("submit", async (e) => {
-                e.preventDefault();
-                
-                // Collect form data
-                const gameSettings = {
-                    gameMode: document.getElementById("gameMode").value,
-                    difficulty: document.getElementById("difficulty").value,
-                    boardSize: document.getElementById("boardSize").value,
-                    firstPlayer: document.getElementById("firstPlayer").value
-                };
+        // Collect form data
+        const gameSettings = {
+          gameMode: document.getElementById("gameMode").value,
+          difficulty: document.getElementById("difficulty").value,
+          boardSize: document.getElementById("boardSize").value,
+          firstPlayer: document.getElementById("firstPlayer").value,
+        };
 
-                // Store settings in sessionStorage
-                sessionStorage.setItem('gameSettings', JSON.stringify(gameSettings));
-                
-                // Navigate to game page
-                navigateTo("/game");
-            });
-        }
+        // Store settings in sessionStorage
+        sessionStorage.setItem("gameSettings", JSON.stringify(gameSettings));
 
-        WithBackButton.addBackButtonListener.call(this);
+        // Navigate to game page
+        navigateTo("/game");
+      });
     }
+
+    WithBackButton.addBackButtonListener.call(this);
+  }
 }
 
 class GameRunnerView extends BaseView {
-    constructor() {
-        super();
-        this.setTitle("Nine Men's Morris");
-    }
+  constructor() {
+    super();
+    this.setTitle("Nine Men's Morris");
+  }
 
-    async getHtml() {
-        return `
+  async getHtml() {
+    return `
             <div class="game-container">
-                <header class="game-header">
-                   
-                </header>
-                <div id="container">
-                    <div class="piece-container" id="red-pieces"></div>
-                    <div id="board"></div>
-                    <div class="piece-container" id="black-pieces"></div>
-                </div>
-
-                 <div class="game-info">
-                        <span id="current-player"></span>
-                        <button id="exit-btn">Exit Game</button>
-                    </div>
-            </div>
-        `;
-    }
     
-    async initialize() {
-        try {
-            const boardElement = document.getElementById('board');
-            if (!boardElement) {
-                console.error('Board element not found');
-                return;
-            }
+    <div class="game-info">
+      <span id="current-player">Current Turn: White</span>
+      <span id="game-message">Game in progress - White to move</span>
+      <button id="exit-btn">Exit Game</button>
+    </div>
 
-            // Get game settings from sessionStorage
-            const gameSettings = JSON.parse(sessionStorage.getItem('gameSettings') || '{}');
+    <div id="game-screen">
+      <div class="piece-container" id="red-pieces">
+      Red Pieces
+      </div>
+      <div id="board">
+      </div>
+      <div class="piece-container" id="black-pieces"> 
+      Black Pieces
+      </div>
+    </div>
+  </div>
+        `;
+  }
 
-            // Import board module
-            const boardModule = await import('./board.js');
+  async initialize() {
+    try {
+      const boardElement = document.getElementById("board");
+      if (!boardElement) {
+        console.error("Board element not found");
+        return;
+      }
 
-            // Add event listeners
-            const exitBtn = document.getElementById('exit-btn');
-            if (exitBtn) {
-                exitBtn.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    boardModule.cleanup(); 
-                    sessionStorage.removeItem('gameSettings');
-                    navigateTo('/');
-                });
-            }
+      // Get game settings from sessionStorage
+      const gameSettings = JSON.parse(
+        sessionStorage.getItem("gameSettings") || "{}"
+      );
 
-            // Initial game start
-            if (typeof boardModule.run_game === 'function') {
-                await boardModule.run_game(gameSettings);
-            } else {
-                console.error('run_game function not found in board module');
-            }
+      // Import board module
+      const boardModule = await import("./board.js");
 
-        } catch (error) {
-            console.error('Error initializing game:', error);
-        }
+      // Add event listeners
+      const exitBtn = document.getElementById("exit-btn");
+      if (exitBtn) {
+        exitBtn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          boardModule.cleanup();
+          sessionStorage.removeItem("gameSettings");
+          navigateTo("/");
+        });
+      }
+
+      // Initial game start
+      if (typeof boardModule.run_game === "function") {
+        await boardModule.run_game(gameSettings);
+      } else {
+        console.error("run_game function not found in board module");
+      }
+    } catch (error) {
+      console.error("Error initializing game:", error);
     }
+  }
 }
-  
 
 class RankingView extends BaseView {
   constructor() {
@@ -412,7 +418,7 @@ class RankingView extends BaseView {
   }
   initialize() {
     WithBackButton.addBackButtonListener.call(this);
-}
+  }
 }
 
 export {

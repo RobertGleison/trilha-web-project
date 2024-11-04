@@ -51,15 +51,22 @@ body {
                  2px -2px 0 rgb(249, 249, 248), -2px -2px 0 rgb(249, 249, 248);
   }
   /* Grid layout for the container */
-  #container {
+  
+#game-screen {
     display: grid;
-    grid-template-columns: auto 800px auto; /* Left pieces, board, right pieces */
-    gap: 10px;
+    grid-template-columns: 100px 800px 100px;
+    gap: 20px;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    margin-top: 20px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-top: 20px;  /* Adds space between game-info and board */
   }
+
+
   /* Styling for the piece containers */
   .piece-container {
     display: flex;
@@ -268,13 +275,21 @@ a {
     background-color: #007a63;  /* Optional: darker on hover */
 }
 
-#backBtn {
-    background-color: #666;  /* Different color for back button */
-}
-
-#backBtn:hover {
-    background-color: #555;
-}
+.back-btn {
+    background: #444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  
+  .back-btn:hover {
+    background: #555;
+  }
+  
+  
 
 /* Responsive adjustments */
 @media screen and (max-width: 768px) {
@@ -650,11 +665,13 @@ a {
 
 /* board */
 .game-container {
-    width: calc(100% - var(--nav--width));
-    margin-left: var(--nav--width);
-    padding: 2rem;
+    margin-left: var(--nav-width);
     min-height: 100vh;
-}
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
 
 .game-header {
     display: flex;
@@ -670,9 +687,15 @@ a {
 
 .game-info {
     display: flex;
-    gap: 1rem;
+    gap: 2rem;
     align-items: center;
-}
+    justify-content: center;
+    margin-top: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
 
 #current-player {
     font-size: 1.2rem;
@@ -737,3 +760,26 @@ a {
     background-color: #666;
     color: white;
 }
+
+
+#current-player {
+    font-weight: bold;
+    color: #444;
+  }
+  
+  #game-message {
+    color: #666;
+  }
+  
+  #exit-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  #exit-btn:hover {
+    background: #ff6666;
+  }
