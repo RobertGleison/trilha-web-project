@@ -33,7 +33,48 @@ const WithBackButton = {
   },
 };
 
-class LoginView extends BaseView
+class LoginView extends BaseView {
+    constructor(){
+        super();
+        this.setTitle("Login");
+    }
+
+    async getHtml() {
+        return `
+        <div class="auth-container">
+                <h1>Nine Men's Morris</h1>
+                <form id="authForm" class="auth-form">
+                    <input type="text" id="username" placeholder="Username" required>
+                    <input type="password" id="password" placeholder="Password" required>
+                    <button type="submit" class="login-button">Login</button>
+                    <button type="submit" class="login-button">Register</button>
+                </form>
+            </div>
+        
+        `
+    };
+
+    initialize() {
+        document.getElementById('authForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username && password) {
+                localStorage.setItem('isAuthenticated', 'true');
+                localStorage.setItem('username', username);
+                navigateTo('/');  // Use navigateTo instead of this.router.navigate
+            }
+        });
+    }
+    cleanup() {
+        const form = document.getElementById('authForm');
+        if (form) {
+            form.removeEventListener('submit', this.handleSubmit);
+        }
+    }
+
+}
 
 
 
@@ -428,4 +469,5 @@ export {
   HowToPlayView,
   RankingView,
   GameRunnerView,
+  LoginView
 };
