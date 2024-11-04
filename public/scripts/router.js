@@ -5,12 +5,8 @@ const navigateTo = url => {
     router();
 };
 
-function isAuthenticated() {
-    return localStorage.getItem('isAuthenticated') === 'true';
-}
 
 const router = async () => {
-    // Check authentication first
     if (!isAuthenticated() && location.pathname !== '/login') {
         history.pushState(null, null, '/login');
     }
@@ -49,6 +45,10 @@ const router = async () => {
     }
 };
 
+function isAuthenticated() {
+    return localStorage.getItem('isAuthenticated') === 'true';
+}
+
 window.addEventListener("popstate", router);
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -59,8 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.target.matches("[data-link]")) {
             e.preventDefault();
             navigateTo(e.target.href);
-        }
-    });
+        }});
 
     // Force check authentication and route accordingly
     if (!isAuthenticated()) {
@@ -70,4 +69,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-export { router, navigateTo };
+export { navigateTo };

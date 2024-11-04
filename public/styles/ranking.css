@@ -1,88 +1,77 @@
-
-/* ranking */
-/* Ranking Container */
+/* Base Container Styles
+---------------------------------------- */
 .ranking-container {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
     width: 100%;
     overflow-x: auto;
-}
-
-/* Ranking Table */
-.ranking-table {
+  }
+  
+  /* Table Base Styles
+  ---------------------------------------- */
+  .ranking-table {
     width: 100%;
     border-collapse: collapse;
     background: white;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-}
-
-/* Table Headers */
-.ranking-table thead {
+  }
+  
+  /* Header Styles
+  ---------------------------------------- */
+  .ranking-table thead {
     background-color: #009579;
     color: white;
-}
-
-.ranking-table th {
+  }
+  
+  .ranking-table th {
     padding: 1.5rem;
     font-size: 1.2rem;
     font-weight: 600;
     text-align: left;
     white-space: nowrap;
-}
-
-/* Table Body */
-.ranking-table td {
+  }
+  
+  /* Cell Styles
+  ---------------------------------------- */
+  .ranking-table td {
     padding: 1.2rem 1.5rem;
     font-size: 1.1rem;
     border-bottom: 1px solid #eee;
-}
-
-/* Center specific columns */
-.ranking-table td:nth-child(3),  /* Pieces Left */
-.ranking-table th:nth-child(3) {
+  }
+  
+  /* Column Alignment
+  ---------------------------------------- */
+  /* Center specific columns */
+  .ranking-table td:nth-child(3),
+  .ranking-table th:nth-child(3),
+  .ranking-table td:nth-child(4),
+  .ranking-table td:nth-child(5),
+  .ranking-table th:nth-child(4),
+  .ranking-table th:nth-child(5) {
     text-align: center;
-}
-
-/* Game Mode and AI Difficulty columns */
-.ranking-table td:nth-child(4),
-.ranking-table td:nth-child(5) {
-    text-align: center;
-}
-
-.ranking-table th:nth-child(4),
-.ranking-table th:nth-child(5) {
-    text-align: center;
-}
-
-/* AI Difficulty colors */
-.ranking-table td:nth-child(5) {
+  }
+  
+  /* AI Difficulty Styles
+  ---------------------------------------- */
+  .ranking-table td:nth-child(5) {
     font-weight: 500;
-}
-
-.ranking-table td:nth-child(5):contains("Hard") {
+  }
+  
+  .ranking-table td:nth-child(5):contains("Hard") {
     color: #e74c3c;
-}
-
-.ranking-table td:nth-child(5):contains("Medium") {
+  }
+  
+  .ranking-table td:nth-child(5):contains("Medium") {
     color: #f39c12;
-}
-
-.ranking-table td:nth-child(5):contains("Easy") {
+  }
+  
+  .ranking-table td:nth-child(5):contains("Easy") {
     color: #27ae60;
-}
-
-/* Zebra Striping */
-.ranking-table tbody tr:nth-child(even) {
-    background-color: rgba(0, 149, 121, 0.05);
-}
-
-/* Hover Effect */
-.ranking-table tbody tr:hover {
-    background-color: rgba(0, 149, 121, 0.1);
-}
-
-/* Rank Styling */
-.rank {
+  }
+  
+  /* Rank Badge Styles
+  ---------------------------------------- */
+  .rank {
     display: inline-block;
     width: 2.5rem;
     height: 2.5rem;
@@ -91,68 +80,78 @@
     border-radius: 50%;
     font-weight: bold;
     color: white;
-}
-
-.rank-1 {
+  }
+  
+  .rank-1 {
     background: #ffd700; /* Gold */
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-
-.rank-2 {
+  }
+  
+  .rank-2 {
     background: #c0c0c0; /* Silver */
     box-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
-}
-
-.rank-3 {
+  }
+  
+  .rank-3 {
     background: #cd7f32; /* Bronze */
     box-shadow: 0 0 10px rgba(205, 127, 50, 0.5);
-}
-
-/* Other ranks */
-.rank:not(.rank-1):not(.rank-2):not(.rank-3) {
+  }
+  
+  .rank:not(.rank-1):not(.rank-2):not(.rank-3) {
     background: #009579;
-}
-
-/* Responsive Design */
-@media screen and (max-width: 768px) {
+  }
+  
+  /* Visual Effects
+  ---------------------------------------- */
+  /* Zebra Striping */
+  .ranking-table tbody tr:nth-child(even) {
+    background-color: rgba(0, 149, 121, 0.05);
+  }
+  
+  /* Hover Effect */
+  .ranking-table tbody tr:hover {
+    background-color: rgba(0, 149, 121, 0.1);
+  }
+  
+  /* Animation */
+  .ranking-table tbody tr {
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Responsive Design
+  ---------------------------------------- */
+  @media screen and (max-width: 768px) {
     .ranking-container {
-        padding: 1rem;
+      padding: 1rem;
     }
-
+  
     .ranking-table th,
     .ranking-table td {
-        padding: 1rem;
-        font-size: 1rem;
+      padding: 1rem;
+      font-size: 1rem;
     }
-
+  
     .rank {
-        width: 2rem;
-        height: 2rem;
-        line-height: 2rem;
+      width: 2rem;
+      height: 2rem;
+      line-height: 2rem;
     }
-}
-
-/* For very small screens */
-@media screen and (max-width: 480px) {
+  }
+  
+  @media screen and (max-width: 480px) {
     .ranking-table th,
     .ranking-table td {
-        padding: 0.8rem;
-        font-size: 0.9rem;
+      padding: 0.8rem;
+      font-size: 0.9rem;
     }
-
+  
     .content-title {
-        font-size: 2rem;
-        margin-bottom: 1.5rem;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
     }
-    
-    /* Stack the rank and name on small screens */
+  
     .ranking-table td:first-child,
     .ranking-table th:first-child {
-        padding-right: 0.5rem;
+      padding-right: 0.5rem;
     }
-}
-
-/* Animation for rows */
-.ranking-table tbody tr {
-    transition: background-color 0.3s ease;
-}
+  }
