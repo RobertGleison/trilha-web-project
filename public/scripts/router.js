@@ -47,23 +47,20 @@ function getUrlMatch() {
     // If no match, return 404 view
     if (!match) {
         return {
-            route: {
-                view: NotFoundView
-            },
+            route: { view: NotFoundView },
             isMatch: true
-        };
-    }
+        };}
 
     // If have match but not authenticated (except login page), redirect to login
     if (!isAuthenticated() && location.pathname !== '/login') {
         match = {
             route: routes[0], // LoginView
             isMatch: true
-        };
-    }
+        };}
 
     return match;
 }
+
 
 const router = async () => {
     const match = getUrlMatch();
