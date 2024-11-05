@@ -164,6 +164,45 @@ class GameRunnerView extends BaseView {
 
 
 
+class NotFoundView extends BaseView {
+    constructor() {
+        super();
+        this.setTitle("404 - Page Not Found");
+    }
+
+    async getHtml() {
+        return await TemplateLoader.loadTemplate('404');
+    }
+
+    initialize() {
+        const homeBtn = document.getElementById("homeBtn");
+        const backBtn = document.getElementById("backBtn");
+
+        if (homeBtn) {
+            homeBtn.addEventListener("click", () => {
+                navigateTo("/");
+            });
+        }
+
+        if (backBtn) {
+            backBtn.addEventListener("click", () => {
+                window.history.back();
+            });
+        }
+    }
+
+    cleanup() {
+        const homeBtn = document.getElementById("homeBtn");
+        const backBtn = document.getElementById("backBtn");
+
+        homeBtn?.removeEventListener("click", this.handleHomeClick);
+        backBtn?.removeEventListener("click", this.handleBackClick);
+    }
+}
+    
+
+
+
 
 class TemplateLoader {
     static async loadTemplate(name) {
@@ -198,4 +237,5 @@ export {
   RankingView,
   GameRunnerView,
   LoginView,
+  NotFoundView,
 };
