@@ -1,25 +1,45 @@
 import { BaseView, RulesView, GameView, HowToPlayView, RankingView, GameRunnerView, LoginView } from './views.js';
 
-const navigateTo = url => {
+
+const routes = [
+    { path: "/login", view: LoginView },
+    { path: "/", view: BaseView },
+    { path: "/rules", view: RulesView },
+    { path: "/game-setup", view: GameView },
+    { path: "/how-to-play", view: HowToPlayView },
+    { path: "/ranking", view: RankingView },
+    { path: "/game", view: GameRunnerView }
+];
+
+
+function navigateTo(url){
     history.pushState(null, null, url);
     router();
-};
+}
 
 
-const router = async () => {
+function isAuthenticated() {
+    return localStorage.getItem('isAuthenticated') === 'true';
+}
+
+
+function loadInitialContent() {
+    localStorage.removeItem('isAuthenticated'); // Clear authentication on startup (optional - remove if you want to persist login)
+    
+    document.body.addEventListener("click", e => {
+        if (e.target.matches("[data-link]")) {
+            e.preventDefault();
+            navigateTo(e.target.href);
+        }});
+   
+    !isAuthenticated ? navigateTo('/login') : router(); // Force check authentication and route accordingly
+}
+
+
+function getUrlMatch () {
     if (!isAuthenticated() && location.pathname !== '/login') {
         history.pushState(null, null, '/login');
     }
-
-    const routes = [
-        { path: "/login", view: LoginView },
-        { path: "/", view: BaseView },
-        { path: "/rules", view: RulesView },
-        { path: "/game-setup", view: GameView },
-        { path: "/how-to-play", view: HowToPlayView },
-        { path: "/ranking", view: RankingView },
-        { path: "/game", view: GameRunnerView }
-    ];
 
     const potentialMatches = routes.map(route => {
         return {
@@ -38,35 +58,21 @@ const router = async () => {
         };
     }
 
-    const view = new match.route.view();
-    document.querySelector("#app").innerHTML = await view.getHtml();
-    if (typeof view.initialize === 'function') {
-        view.initialize();
-    }
-};
-
-function isAuthenticated() {
-    return localStorage.getItem('isAuthenticated') === 'true';
+    return match;
 }
 
+
+const router = async () => {
+    let match = getUrlMatch();
+    const view = new match.route.view();
+    document.querySelector("#app").innerHTML = await view.getHtml();
+
+    if (typeof view.initialize === 'function') { view.initialize(); }
+};
+
+
 window.addEventListener("popstate", router);
-
-document.addEventListener("DOMContentLoaded", () => {
-    // Clear authentication on startup (optional - remove if you want to persist login)
-    localStorage.removeItem('isAuthenticated');
+document.addEventListener("DOMContentLoaded", loadInitialContent);
     
-    document.body.addEventListener("click", e => {
-        if (e.target.matches("[data-link]")) {
-            e.preventDefault();
-            navigateTo(e.target.href);
-        }});
-
-    // Force check authentication and route accordingly
-    if (!isAuthenticated()) {
-        navigateTo('/login');
-    } else {
-        router();
-    }
-});
 
 export { navigateTo };
