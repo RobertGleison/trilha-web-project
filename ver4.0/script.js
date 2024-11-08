@@ -1,7 +1,7 @@
 /*INSTRUÇÕES 
 Para alterar as configuraçoes inicias do board sera necessario alterar as variaveis globais de acordo com o desejado,
 por exemplo se quiser que as black pieces comecem e tenham a dificuldade easy deve chamar a função opponentStarts()
-e colocar o ai_options como 1, é importante destacar que nenhum nome das variaveis globais devem ser alterados
+e colocar o ai_options como 1, é importante destacar que nenhuma das declarações das variaveis globais devem ser alteradas
 
 Para desistir do jogo deve chamar a função reset, ainda falta implementar a parte em que uma mensagem com feedback na pagina é dada,
 porém o jogo ja é reniciado. Também, para obter o score é necessario que chame a função score()
@@ -10,8 +10,6 @@ Alterar tamanho do board: modifique o valor de n
 Alterar a dificulade e modo de jogo: modificar valor de ai_options, instruções na variavel ai_options
 Alterar primeiro jogador a jogar: chamar função opponentStarts()
 Para ver de quem é o turno: se is_player_red  == true é o turno do red, caso contrario é o turno do black
-
-Idealmente o codigo deveria estar modulado, para uma segunda etapa de entrega isso sera feito.
 */ 
 
 
@@ -36,17 +34,17 @@ let ai_options = 0 // escolhe a dificuldade da ai 0: 2 players 1: easy 2: medium
 let flag_start = false // para indicar se o primeiro move deve ser a ai que faz
 /*----------------------------------------------------------------------------------------------*/
 
-function opponentStarts(){ // para as pecas pretas comecarem jogando
+function opponentStarts(){ // para as pecas pretas comecarem jogando //
     is_player_red = false
     flag_start = true
 }
 
-function giveUp(){ //para desistir do jogo
+function giveUp(){ //para desistir do jogo //
     reset()
     run_game()
 }
 
-function score(){ //retorna o score total
+function score(){ //retorna o score total //
     return (number_of_red_pieces/n*3)*1000
 }
 
@@ -66,7 +64,6 @@ function runAiMovePhase(){ //para a ai jogar na fase de mover as pecas
         let index = getRandomInt(moves_list.length)
         let id = moves_list[index].toString()
         let button = document.getElementById(id)
-        console.log(id + "jacarre")
         button.click()
         let next_move_list = validMoves(button)
         let next_move = document.getElementById(next_move_list[0].toString())
@@ -74,7 +71,7 @@ function runAiMovePhase(){ //para a ai jogar na fase de mover as pecas
     }
 }
 
-function getRandomInt(max) { // funcao para conseguir um numero aleatorio
+function getRandomInt(max) { // funcao para conseguir um numero aleatorio //
     return Math.floor(Math.random() * max);
   }
 
@@ -104,7 +101,7 @@ function aiEasyRemove(){ // para a ai remover as pecas
     return valid_moves_list[index].toString()
 }
 
-function reset(){ // reseta o board
+function reset(){ // reseta o board //
     game_list = []; // contem todos os estados de todos os botoes
     placing_pieces = false; //variavel para ver se esta no estado de colocar as peças
     is_player_red = true; //variavel para determinar o turno
@@ -126,7 +123,7 @@ function delay(ms) { // delay para esperar acao do jogador
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function createSquares(n) { // cria o board square por square
+function createSquares(n) { // cria o board square por square //
     const board = document.getElementById('board');
     const initialSize = 125;
     const sizeIncrement = 125;
@@ -164,7 +161,7 @@ function createSquares(n) { // cria o board square por square
         createButton(i, size, size, '8');              // Bottom-left corner
 
       board.appendChild(square);
-      game_list.push(Array(8).fill('empty'));
+      game_list.push(Array(8).fill('empty'))
     }
 }
   
@@ -223,18 +220,14 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
         }
     }
     else if(move_phase && !choose_piece){ //para a fase de mover as pecinhas
-        console.log("michael")
         const id = button.id.split('').map(Number);
         if(no_selected_button && ((game_list[id[0]-1][id[1]-1] == 'empty') || game_list[id[0]-1][id[1]-1] == 'black' && is_player_red || game_list[id[0]-1][id[1]-1] == 'red' && !is_player_red )){
-            console.log(game_list[id[0]-1][id[1]-1])
-            console.log("BBBBBBB")
             addGlowEffect("red");
                 setTimeout(() => {
                     removeGlowEffect();
                     }, 1000);
         }
         else if(no_selected_button){ //se chegou aqui eh porque o botao clicado era valido
-            console.log("Franklin")
             if(red_pieces_free_movement && is_player_red && !choose_piece){
                 no_selected_button = false
                 button.classList.add('original_selected'); // Marca o botão como selecionado para evitar cliques duplicados
@@ -250,7 +243,6 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             else{
                 valid_moves_list = validMoves(button);
                 if(valid_moves_list.length == 0){
-                    console.log("AAAAAAA")
                     addGlowEffect("red");
                     setTimeout(() => {
                         removeGlowEffect();
@@ -265,14 +257,11 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             }
         }
         else if(!no_selected_button){
-            console.log("les not go")
             if(buttonIsValidMove(button)){
                 const pbutton = document.querySelector('.original_selected')
                 const pid= pbutton.id.split('').map(Number);
                 const id= button.id.split('').map(Number);
-                console.log(game_list[pid[0]-1][pid[1]-1])
                 game_list[pid[0]-1][pid[1]-1] = 'empty'
-                console.log(game_list[pid[0]-1][pid[1]-1])
                 pbutton.classList.remove('glow_green')
                 pbutton.classList.remove('original_selected')
                 pbutton.style.backgroundImage = 'none'
@@ -297,7 +286,6 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
                 pbutton.classList.remove('glow_green')
                 pbutton.classList.remove('original_selected')
                 no_selected_button = true
-                console.log("CCCCCCC")
                 addGlowEffect("red");
                 setTimeout(() => {
                     removeGlowEffect();
@@ -308,7 +296,6 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
 
     }
     else if(choose_piece){
-       console.log("amanda")
        const id= button.id.split('').map(Number);
        if(button.classList.contains('removable')){
             removeGlowEffect()
@@ -415,13 +402,10 @@ function checkBoard(){ //checa os mills do board
                 document.getElementById((i+1).toString().concat("3"))?.classList.add("is_in_mill_horizontal")
                 document.getElementById((i+1).toString().concat("3"))?.classList.add((i+1).toString().concat("3_LockHR"))
                 removePiece("black")
-                console.log("entrou aq")
         }
         if((game_list[i][0] != 'red' && document.getElementById((i+1).toString().concat("1"))?.classList.contains("is_in_mill_horizontal") && document.getElementById((i+1).toString().concat("1"))?.classList.contains((i+1).toString().concat("1_LockHR"))) 
             || (game_list[i][1] != 'red' && document.getElementById((i+1).toString().concat("2"))?.classList.contains("is_in_mill_horizontal") && document.getElementById((i+1).toString().concat("2"))?.classList.contains((i+1).toString().concat("2_LockHR"))) 
             || (game_list[i][2] != 'red' && document.getElementById((i+1).toString().concat("3"))?.classList.contains("is_in_mill_horizontal") && document.getElementById((i+1).toString().concat("3"))?.classList.contains((i+1).toString().concat("3_LockHR")))){ //modificar true por indicador de mill
-                console.log(document.getElementById((i+1).toString().concat("1"))?.classList.contains((i+1).toString().concat("1_LockHR")))
-                console.log("filha da puta")
                 document.getElementById((i+1).toString().concat("1"))?.classList.remove("is_in_mill_horizontal")
                 document.getElementById((i+1).toString().concat("1"))?.classList.remove((i+1).toString().concat("1_LockHR"))
                 document.getElementById((i+1).toString().concat("2"))?.classList.remove("is_in_mill_horizontal")
@@ -686,7 +670,6 @@ function checkBoard(){ //checa os mills do board
         if((game_list[i][0] == 'black' && !document.getElementById((i+1).toString().concat("1"))?.classList.contains("is_in_mill_vertical") && !document.getElementById((i+1).toString().concat("1"))?.classList.contains((i+1).toString().concat("1_LockVB"))) 
             && (game_list[i][3] == 'black' && !document.getElementById((i+1).toString().concat("4"))?.classList.contains("is_in_mill_vertical") && !document.getElementById((i+1).toString().concat("4"))?.classList.contains((i+1).toString().concat("4_LockVB"))) 
             && (game_list[i][5] == 'black' && !document.getElementById((i+1).toString().concat("6"))?.classList.contains("is_in_mill_vertical") && !document.getElementById((i+1).toString().concat("6"))?.classList.contains((i+1).toString().concat("6_LockVB")))){ //modificar true por indicador de mill
-                console.log("bang bang entrou aq")
                 document.getElementById((i+1).toString().concat("1"))?.classList.add("is_in_mill_vertical")
                 document.getElementById((i+1).toString().concat("1"))?.classList.add((i+1).toString().concat("1_LockVB"))
                 document.getElementById((i+1).toString().concat("4"))?.classList.add("is_in_mill_vertical")
@@ -698,7 +681,6 @@ function checkBoard(){ //checa os mills do board
         if((game_list[i][0] != 'black' && document.getElementById((i+1).toString().concat("1"))?.classList.contains("is_in_mill_vertical") && document.getElementById((i+1).toString().concat("1"))?.classList.contains((i+1).toString().concat("1_LockVB"))) 
             || (game_list[i][3] != 'black' && document.getElementById((i+1).toString().concat("4"))?.classList.contains("is_in_mill_vertical") && document.getElementById((i+1).toString().concat("4"))?.classList.contains((i+1).toString().concat("4_LockVB"))) 
             || (game_list[i][5] != 'black' && document.getElementById((i+1).toString().concat("6"))?.classList.contains("is_in_mill_vertical") && document.getElementById((i+1).toString().concat("6"))?.classList.contains((i+1).toString().concat("6_LockVB")))){ //modificar true por indicador de mill
-                console.log("bang entrou aq")
                 document.getElementById((i+1).toString().concat("1"))?.classList.remove("is_in_mill_vertical")
                 document.getElementById((i+1).toString().concat("1"))?.classList.remove((i+1).toString().concat("1_LockVB"))
                 document.getElementById((i+1).toString().concat("4"))?.classList.remove("is_in_mill_vertical")
@@ -811,7 +793,6 @@ function removePiece(color){ //remove uma piece
             if(ai_options == 1){
                 var id = aiEasyRemove()
                 let button = document.getElementById(id)
-                console.log(id + "gato")
                 button.click()
             }
         number_of_red_pieces--
@@ -824,24 +805,20 @@ function isneighbor(id, idOB){ //checa se um piece eh vizinho de um outro
     if(((id[0] == idOB[0]) && 
     ((id[1] == 1 && idOB[1] == 4) || (id[1] == 3 && idOB[1] == 5) || (id[1] == 4 && idOB[1] == 6) || (id[1] == 5 && idOB[1] == 8))
     ) || (id[0] == idOB[0]-1 && id[1] == 7 && idOB[1] == 7) || (id[0]-1 == idOB[0] && id[1] == 2 && idOB[1] == 2)){
-        console.log("baixo")
         return true;
     }
     //checa para cima
     if(((idOB[0] == id[0]) && 
     ((idOB[1] == 1 && id[1] == 4) || (idOB[1] == 3 && id[1] == 5) || (idOB[1] == 4 && id[1] == 6) || (idOB[1] == 5 && id[1] == 8))
     ) || (idOB[0] == id[0]-1 && idOB[1] == 7 && id[1] == 7) || (id[0] == idOB[0]-1 && id[1] == 2 && idOB[1] == 2)){
-        console.log("cima")
         return true;
     }
     //checa para direita
     if(((id[0] == idOB[0]) && (id[1] + 1 == idOB[1] && (id[1] != 4 && idOB[1] != 4) && (id[1] != 5 && idOB[1] != 5))) || (id[0] == idOB[0]-1 && id[1] == 5 && idOB[1] == 5) || (id[0]-1 == idOB[0] && id[1] == 4 && idOB[1] == 4)){
-        console.log("direita")
         return true
     }
     //checa para esquerda
     if(((idOB[0] == id[0]) && (idOB[1] + 1 == id[1] && (id[1] != 4 && idOB[1] != 4) && (id[1] != 5 && idOB[1] != 5))) || (idOB[0] == id[0]-1 && idOB[1] == 5 && id[1] == 5) || (idOB[0]-1 == id[0] && idOB[1] == 4 && id[1] == 4)){
-        console.log("esquerda")
         return true
     }
     return false;
@@ -868,7 +845,6 @@ async function placePiecesHuman() { //para a fase de colocar os pieces
       if(ai_options == 1 && !is_player_red && !choose_piece){
         let id = aiEasySetup()
         let button = document.getElementById(id)
-        console.log(id + "cachorro")
         button.click()
       }
       if(flag_start){
@@ -878,7 +854,7 @@ async function placePiecesHuman() { //para a fase de colocar os pieces
       }
     }
     while(true){
-        if(!is_player_red){
+        if(!is_player_red && ai_options != 0){
             runAiMovePhase()
         }
         await waitPlayer(); 
@@ -886,7 +862,7 @@ async function placePiecesHuman() { //para a fase de colocar os pieces
     }
 }
 
-function addGlowEffect(color) {
+function addGlowEffect(color) { //
     const buttons = document.querySelectorAll('.button');
     if(color == "green"){
         buttons.forEach(button => {
@@ -905,7 +881,7 @@ function addGlowEffect(color) {
     }
   }
   
-function removeGlowEffect() {
+function removeGlowEffect() { //
     const buttons = document.querySelectorAll('.button');
     buttons.forEach(button => {
       button.classList.remove('glow_green');
@@ -921,11 +897,18 @@ async function run_game(){
   number_of_black_pieces =  numPieces
   number_of_red_pieces = numPieces
   //---------------------------------------
-  ai_options = 1
-  opponentStarts()
+  ai_options = 0
+  //opponentStarts()
   setupPieces("red-pieces", "red_checker.png", numPieces);
   setupPieces("black-pieces", "black_checker.png", numPieces);
   placePiecesHuman()
 }
 run_game()
+
+
+// const boardSize = gameSettings.boardSize;
+//     const gameMode = gameSettings.gameMode;
+//     const difficulty = gameSettings.difficulty;
+//     const firstPlayer = gameSettings.firstPlayer;
+
 
