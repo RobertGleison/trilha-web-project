@@ -1,7 +1,7 @@
 /*INSTRUÇÕES 
 Para alterar as configuraçoes inicias do board sera necessario alterar as variaveis globais de acordo com o desejado,
 por exemplo se quiser que as black pieces comecem e tenham a dificuldade easy deve chamar a função opponentStarts()
-e colocar o ai_options como 1, é importante destacar que nenhuma das variaveis globais devem ser alteradas
+e colocar o ai_options como 1, é importante destacar que nenhum nome das variaveis globais devem ser alterados
 
 Para desistir do jogo deve chamar a função reset, ainda falta implementar a parte em que uma mensagem com feedback na pagina é dada,
 porém o jogo ja é reniciado. Também, para obter o score é necessario que chame a função score()
