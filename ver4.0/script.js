@@ -9,6 +9,7 @@ porém o jogo ja é reniciado. Também, para obter o score é necessario que cha
 Alterar tamanho do board: modifique o valor de n
 Alterar a dificulade e modo de jogo: modificar valor de ai_options, instruções na variavel ai_options
 Alterar primeiro jogador a jogar: chamar função opponentStarts()
+Para ver de quem é o turno: se is_player_red  == true é o turno do red, caso contrario é o turno do black
 */ 
 
 
