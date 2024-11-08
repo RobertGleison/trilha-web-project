@@ -164,7 +164,7 @@ function createSquares(n) { // cria o board square por square
         createButton(i, size, size, '8');              // Bottom-left corner
 
       board.appendChild(square);
-      game_list.push(['empty','empty','empty','empty','empty','empty','empty','empty']);
+      game_list.push(Array(8).fill('empty'));
     }
 }
   
