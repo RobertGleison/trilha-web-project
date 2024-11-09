@@ -139,7 +139,6 @@ function reset(){ // reseta o board //
     number_of_black_pieces = 0 // numero de peças pretas
     black_pieces_free_movement = false
     red_pieces_free_movement = false
-    run_game()
 }
 
 function delay(ms) { // delay para esperar acao do jogador
@@ -918,11 +917,13 @@ function removeGlowEffect() { //
   }
   // Run the function with a specified number of squares
 async function run_game(gameSettings = {}){
+    const exitButton = document.getElementById("exit-btn"); //para resetar o jogo quando sai da pagina
+
+    exitButton.addEventListener("click", function() {
+        reset()
+    });
   /*NAO MUDAR
   --------------------------------------  */
-
-  console.log(gameSettings.boardSize)
-  console.log(gameSettings.gameMode)
   n = gameSettings.boardSize;
   if(gameSettings.firstPlayers == "player2"){
     opponentStarts()
