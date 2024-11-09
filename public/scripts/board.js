@@ -1,4 +1,6 @@
-/*INSTRUÇÕES 
+
+window.Board = (function() {
+    /*INSTRUÇÕES 
 Para alterar as configuraçoes inicias do board sera necessario alterar as variaveis globais de acordo com o desejado,
 por exemplo se quiser que as black pieces comecem e tenham a dificuldade easy deve chamar a função opponentStarts()
 e colocar o ai_options como 1, é importante destacar que nenhuma das declarações das variaveis globais devem ser alteradas
@@ -11,24 +13,7 @@ Alterar a dificulade e modo de jogo: modificar valor de ai_options, instruções
 Alterar primeiro jogador a jogar: chamar função opponentStarts()
 Para ver de quem é o turno: se is_player_red  == true é o turno do red, caso contrario é o turno do black
 */ 
-window.Board = (function() {
-    // Your board code here
-    async function run_game(gameSettings) {
-    const boardSize = gameSettings.boardSize;
 
-  /*NAO MUDAR
-  --------------------------------------  */
-  createSquares(boardSize);
-  const numPieces = 3 * boardSize;
-  number_of_black_pieces =  numPieces
-  number_of_red_pieces = numPieces
-  //---------------------------------------
-  ai_options = 0
-  //opponentStarts()
-  setupPieces("red-pieces", "./assets/red_piece.png", numPieces);
-  setupPieces("black-pieces", "./assets/black_piece.png", numPieces);
-  placePiecesHuman(boardSize)
-}
 
 
 /*IMPORTANTE NAO MEXER NA INICIALIZAÇÂO DAS VARIAVEIS GLOBAIS, O CODIGO NAO IRA FUNCIONAR CASO CONTRARIO
@@ -41,7 +26,7 @@ let selection_success = true; // variavel para determinar o sucesso de um loop n
 let no_selected_button = true; //variavel para auxiliar a mover as peças na fase de mover
 let move_phase = false; // variavel para determinar se esta na fase de mover as peças
 let valid_moves_list = [] // lista de movimentos validos dado um certo botao/casa
-// let n = 2; // numero de quadrados no board
+let n = 4; // numero de quadrados no board
 let choose_piece = false //retirar peças do board
 let number_of_red_pieces = 0 // numero de peças vermelhas
 let number_of_black_pieces = 0 // numero de peças pretas
@@ -406,7 +391,7 @@ function isValidMove(button, otherbutton){ //checa se o movimento dado eh valido
     }
 }
 
-function checkBoard(n){ //checa os mills do board
+function checkBoard(){ //checa os mills do board
     for(let i = 0; i< n ;i++){
         //check for red horizontally
         if((game_list[i][0] == 'red' && !document.getElementById((i+1).toString().concat("1"))?.classList.contains("is_in_mill_horizontal") && !document.getElementById((i+1).toString().concat("1"))?.classList.contains((i+1).toString().concat("1_LockHR"))) 
@@ -841,7 +826,7 @@ function isneighbor(id, idOB){ //checa se um piece eh vizinho de um outro
     return false;
 }
 
-async function placePiecesHuman(boardSize) { //para a fase de colocar os pieces
+async function placePiecesHuman() { //para a fase de colocar os pieces
     placing_pieces = true;
     while(true) {
       const container = document.getElementById("red-pieces");
@@ -856,7 +841,7 @@ async function placePiecesHuman(boardSize) { //para a fase de colocar os pieces
       }
       if(!flag_start){
         await waitPlayer(); 
-        checkBoard(boardSize)
+        checkBoard()
         removeGlowEffect()
       }
       if(ai_options == 1 && !is_player_red && !choose_piece){
@@ -866,7 +851,7 @@ async function placePiecesHuman(boardSize) { //para a fase de colocar os pieces
       }
       if(flag_start){
         await waitPlayer(); 
-        checkBoard(boardSize)
+        checkBoard()
         removeGlowEffect()
       }
     }
@@ -906,6 +891,26 @@ function removeGlowEffect() { //
     });
   }
   // Run the function with a specified number of squares
+async function run_game(){
+  /*NAO MUDAR
+  --------------------------------------  */
+  createSquares(n);
+  const numPieces = 3 * n;
+  number_of_black_pieces =  numPieces
+  number_of_red_pieces = numPieces
+  //---------------------------------------
+  ai_options = 0
+  //opponentStarts()
+  setupPieces("red-pieces", "./assets/red_piece.png", numPieces);
+  setupPieces("black-pieces", "./assets/black_piece.png", numPieces);
+  placePiecesHuman()
+}
+
+// const boardSize = gameSettings.boardSize;
+//     const gameMode = gameSettings.gameMode;
+//     const difficulty = gameSettings.difficulty;
+//     const firstPlayer = gameSettings.firstPlayer;
+
 
   return {
     run_game
