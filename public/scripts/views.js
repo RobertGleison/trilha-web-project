@@ -146,7 +146,6 @@ class GameRunnerView extends BaseView {
         if (exitBtn) {
             exitBtn.addEventListener("click", async (e) => {
             e.preventDefault();
-            boardModule.cleanup();
             sessionStorage.removeItem("gameSettings");
             navigateTo("/");
             });

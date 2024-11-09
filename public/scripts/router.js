@@ -62,6 +62,18 @@ function getUrlMatch() {
 }
 
 
+const logout = () => {
+    const logoutBtn = document.getElementById("logout");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            localStorage.removeItem('isAuthenticated'); // Remove the actual key, not the function call
+            navigateTo("/login");
+        });
+    }
+};
+
+
 const router = async () => {
     const match = getUrlMatch();
     const view = new match.route.view();
@@ -72,6 +84,8 @@ const router = async () => {
         
         if (typeof view.initialize === 'function') {
             view.initialize();
+        
+            logout();
         }
     } catch (error) {
         console.error('Error in router:', error);
