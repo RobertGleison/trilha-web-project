@@ -11,7 +11,24 @@ Alterar a dificulade e modo de jogo: modificar valor de ai_options, instruções
 Alterar primeiro jogador a jogar: chamar função opponentStarts()
 Para ver de quem é o turno: se is_player_red  == true é o turno do red, caso contrario é o turno do black
 */ 
+window.Board = (function() {
+    // Your board code here
+    async function run_game(gameSettings) {
+    const boardSize = gameSettings.boardSize;
 
+  /*NAO MUDAR
+  --------------------------------------  */
+  createSquares(boardSize);
+  const numPieces = 3 * boardSize;
+  number_of_black_pieces =  numPieces
+  number_of_red_pieces = numPieces
+  //---------------------------------------
+  ai_options = 0
+  //opponentStarts()
+  setupPieces("red-pieces", "./assets/red_piece.png", numPieces);
+  setupPieces("black-pieces", "./assets/black_piece.png", numPieces);
+  placePiecesHuman(boardSize)
+}
 
 
 /*IMPORTANTE NAO MEXER NA INICIALIZAÇÂO DAS VARIAVEIS GLOBAIS, O CODIGO NAO IRA FUNCIONAR CASO CONTRARIO
@@ -196,7 +213,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
     if (placing_pieces && !choose_piece) {
         const id = button.id.split('').map(Number);
         if(is_player_red && (game_list[id[0]-1][id[1]-1] == 'empty')){
-            button.style.backgroundImage = 'url("../assets/red_piece.png")'; // Altera para a imagem do checker
+            button.style.backgroundImage = 'url("./assets/red_piece.png")'; // Altera para a imagem do checker
             button.classList.add('selected'); // Marca o botão como selecionado para evitar cliques duplicados
             const id = button.id.split('').map(Number);
             game_list[id[0]-1][id[1]-1] = 'red'
@@ -206,7 +223,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             selection_success = true
         }
         else if (game_list[id[0]-1][id[1]-1] == 'empty'){
-            button.style.backgroundImage = 'url("../assets/black_piece.png")'; // Altera para a imagem do checker
+            button.style.backgroundImage = 'url("./assets/black_piece.png")'; // Altera para a imagem do checker
             button.classList.add('selected'); // Marca o botão como selecionado para evitar cliques duplicados
             const id = button.id.split('').map(Number);
             game_list[id[0]-1][id[1]-1] = 'black'
@@ -267,14 +284,14 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
                 pbutton.style.backgroundImage = 'none'
                 if(is_player_red){
                     game_list[id[0]-1][id[1]-1] = 'red'
-                    button.style.backgroundImage = 'url("../assets/red_piece.png")';
+                    button.style.backgroundImage = 'url("./assets/red_piece.png")';
                     is_player_red = false 
                     removeGlowEffect()
                     no_selected_button = true
                 }
                 else{
                     game_list[id[0]-1][id[1]-1] = 'black'
-                    button.style.backgroundImage = 'url("../assets/black_piece.png")'; 
+                    button.style.backgroundImage = 'url("./assets/black_piece.png")'; 
                     is_player_red = true
                     removeGlowEffect()
                     no_selected_button = true
@@ -389,7 +406,7 @@ function isValidMove(button, otherbutton){ //checa se o movimento dado eh valido
     }
 }
 
-function checkBoard(){ //checa os mills do board
+function checkBoard(n){ //checa os mills do board
     for(let i = 0; i< n ;i++){
         //check for red horizontally
         if((game_list[i][0] == 'red' && !document.getElementById((i+1).toString().concat("1"))?.classList.contains("is_in_mill_horizontal") && !document.getElementById((i+1).toString().concat("1"))?.classList.contains((i+1).toString().concat("1_LockHR"))) 
@@ -824,7 +841,7 @@ function isneighbor(id, idOB){ //checa se um piece eh vizinho de um outro
     return false;
 }
 
-async function placePiecesHuman() { //para a fase de colocar os pieces
+async function placePiecesHuman(boardSize) { //para a fase de colocar os pieces
     placing_pieces = true;
     while(true) {
       const container = document.getElementById("red-pieces");
@@ -839,7 +856,7 @@ async function placePiecesHuman() { //para a fase de colocar os pieces
       }
       if(!flag_start){
         await waitPlayer(); 
-        checkBoard()
+        checkBoard(boardSize)
         removeGlowEffect()
       }
       if(ai_options == 1 && !is_player_red && !choose_piece){
@@ -849,7 +866,7 @@ async function placePiecesHuman() { //para a fase de colocar os pieces
       }
       if(flag_start){
         await waitPlayer(); 
-        checkBoard()
+        checkBoard(boardSize)
         removeGlowEffect()
       }
     }
@@ -889,27 +906,12 @@ function removeGlowEffect() { //
     });
   }
   // Run the function with a specified number of squares
-export async function run_game(gameSettings){
-    const boardSize = gameSettings.boardSize;
 
-  /*NAO MUDAR
-  --------------------------------------  */
-  createSquares(boardSize);
-  const numPieces = 3 * boardSize;
-  number_of_black_pieces =  numPieces
-  number_of_red_pieces = numPieces
-  //---------------------------------------
-  ai_options = 0
-  //opponentStarts()
-  setupPieces("red-pieces", "../assets/red_piece.png", numPieces);
-  setupPieces("black-pieces", "../assets/black_piece.png", numPieces);
-  placePiecesHuman()
-}
+  return {
+    run_game
+};
+})();
 
 
-// const boardSize = gameSettings.boardSize;
-//     const gameMode = gameSettings.gameMode;
-//     const difficulty = gameSettings.difficulty;
-//     const firstPlayer = gameSettings.firstPlayer;
 
 

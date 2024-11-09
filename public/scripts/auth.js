@@ -1,4 +1,4 @@
-export const authService = {
+const authService = {
     isAuthenticated() {
         return localStorage.getItem('isAuthenticated') === 'true';
     },
