@@ -36,6 +36,19 @@ let ai_options = 0 // escolhe a dificuldade da ai 0: 2 players 1: easy 2: medium
 let flag_start = false // para indicar se o primeiro move deve ser a ai que faz
 /*----------------------------------------------------------------------------------------------*/
 
+function changePlayerTurnText(){
+    const currentPlayerElement = document.getElementById("current-player");
+    const currentPlayerMessage = document.getElementById("game-message");
+    if(is_player_red){
+        currentPlayerElement.textContent = "Current Turn: Red";
+        currentPlayerMessage.textContent = "Game in progress - Red to move"
+    }
+    else{
+        currentPlayerElement.textContent = "Current Turn: Black";
+        currentPlayerMessage.textContent = "Game in progress - Black to move"
+    }
+}
+
 function opponentStarts(){ // para as pecas pretas comecarem jogando //
     is_player_red = false
     flag_start = true
@@ -99,6 +112,14 @@ function aiEasyRemove(){ // para a ai remover as pecas
             valid_moves_list.push(button.id)
         }
       });
+    if(valid_moves_list.length == 0){
+        buttons.forEach(button => {
+            var id = button.id.split('').map(Number);
+            if(game_list[id[0]-1][id[1]-1] == 'red'){
+                valid_moves_list.push(button.id)
+            }
+          });
+    }
     let index = getRandomInt(valid_moves_list.length)
     return valid_moves_list[index].toString()
 }
@@ -206,6 +227,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             removePile("red-pieces");  
             button.classList.remove('selected');
             selection_success = true
+            changePlayerTurnText()
         }
         else if (game_list[id[0]-1][id[1]-1] == 'empty'){
             button.style.backgroundImage = 'url("./assets/black_piece.png")'; // Altera para a imagem do checker
@@ -216,6 +238,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             removePile("black-pieces");
             button.classList.remove('selected');
             selection_success = true
+            changePlayerTurnText()
         }
         else{
             selection_success = false
@@ -273,6 +296,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
                     is_player_red = false 
                     removeGlowEffect()
                     no_selected_button = true
+                    changePlayerTurnText()
                 }
                 else{
                     game_list[id[0]-1][id[1]-1] = 'black'
@@ -280,6 +304,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
                     is_player_red = true
                     removeGlowEffect()
                     no_selected_button = true
+                    changePlayerTurnText()
                 }
                 checkBoard()
             }
@@ -328,6 +353,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             move_phase = true
             choose_piece = false
             selection_success = true
+            changePlayerTurnText()
        }
        else{
             addGlowEffect("red");
@@ -891,16 +917,27 @@ function removeGlowEffect() { //
     });
   }
   // Run the function with a specified number of squares
-async function run_game(){
+async function run_game(gameSettings = {}){
   /*NAO MUDAR
   --------------------------------------  */
+
+  console.log(gameSettings.boardSize)
+  console.log(gameSettings.gameMode)
+  n = gameSettings.boardSize;
+  if(gameSettings.firstPlayers == "player2"){
+    opponentStarts()
+  }
+  if(gameSettings.gameMode == "pvp"){
+    ai_options = 0
+  }
+  else if(gameSettings.gameMode == "pvc"){
+    ai_options = 1
+  }
   createSquares(n);
   const numPieces = 3 * n;
   number_of_black_pieces =  numPieces
   number_of_red_pieces = numPieces
   //---------------------------------------
-  ai_options = 0
-  //opponentStarts()
   setupPieces("red-pieces", "./assets/red_piece.png", numPieces);
   setupPieces("black-pieces", "./assets/black_piece.png", numPieces);
   placePiecesHuman()
