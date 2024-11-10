@@ -36,7 +36,7 @@ let ai_options = 0 // escolhe a dificuldade da ai 0: 2 players 1: easy 2: medium
 let flag_start = false // para indicar se o primeiro move deve ser a ai que faz
 /*----------------------------------------------------------------------------------------------*/
 
-function changePlayerTurnText(){
+function updateturn(){
     const currentPlayerElement = document.getElementById("current-player");
     const currentPlayerMessage = document.getElementById("game-message");
     if(is_player_red){
@@ -46,6 +46,17 @@ function changePlayerTurnText(){
     else{
         currentPlayerElement.textContent = "Current Turn: Black";
         currentPlayerMessage.textContent = "Game in progress - Black to move"
+    }
+}
+
+
+function updateRemovingPiece(player){
+    const currentPlayerMessage = document.getElementById("game-message");
+    if(player === "Red"){
+        currentPlayerMessage.textContent = "Game in progress - Remove Black Piece"
+    }
+    else{
+        currentPlayerMessage.textContent = "Game in progress - Remove Red Piece"
     }
 }
 
@@ -226,7 +237,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             removePile("red-pieces");  
             button.classList.remove('selected');
             selection_success = true
-            changePlayerTurnText()
+            updateturn()
         }
         else if (game_list[id[0]-1][id[1]-1] == 'empty'){
             button.style.backgroundImage = 'url("./assets/black_piece.png")'; // Altera para a imagem do checker
@@ -237,7 +248,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             removePile("black-pieces");
             button.classList.remove('selected');
             selection_success = true
-            changePlayerTurnText()
+            updateturn()
         }
         else{
             selection_success = false
@@ -295,7 +306,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
                     is_player_red = false 
                     removeGlowEffect()
                     no_selected_button = true
-                    changePlayerTurnText()
+                    updateturn()
                 }
                 else{
                     game_list[id[0]-1][id[1]-1] = 'black'
@@ -303,7 +314,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
                     is_player_red = true
                     removeGlowEffect()
                     no_selected_button = true
-                    changePlayerTurnText()
+                    updateturn()
                 }
                 checkBoard()
             }
@@ -352,7 +363,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             move_phase = true
             choose_piece = false
             selection_success = true
-            changePlayerTurnText()
+            updateturn()
        }
        else{
             addGlowEffect("red");
@@ -790,6 +801,7 @@ function checkBoard(){ //checa os mills do board
 function removePiece(color){ //remove uma piece
     if(color == "black"){
         console.log("mill_black")
+        updateRemovingPiece("Red")
         choose_piece = true
         if(placing_pieces){
             removeGlowEffect()
@@ -805,6 +817,7 @@ function removePiece(color){ //remove uma piece
     }
     else if(color == "red"){
         console.log("mill_red")
+        updateRemovingPiece("Black")
         move_phase = false
         choose_piece = true
         if(placing_pieces){
@@ -944,17 +957,10 @@ async function run_game(gameSettings = {}){
   placePiecesHuman()
 }
 
-// const boardSize = gameSettings.boardSize;
-//     const gameMode = gameSettings.gameMode;
-//     const difficulty = gameSettings.difficulty;
-//     const firstPlayer = gameSettings.firstPlayer;
-
-
   return {
     run_game
 };
 })();
-
 
 
 
