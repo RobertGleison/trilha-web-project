@@ -41,12 +41,61 @@ window.Views = (function() {
             super();
             this.setTitle("Ranking");
         }
-
+    
         async getHtml() {
             return await window.TemplateLoader.loadTemplate("ranking");
         }
+    
+        loadRankings() {
+            try {
+                const rankings = JSON.parse(localStorage.getItem('gameRankings')) || [];
+                const tbody = document.querySelector('.ranking-table tbody');
+                
+                if (!tbody) {
+                    console.error("Ranking table not found");
+                    return;
+                }
+    
+                if (rankings.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center;">No games played yet</td>
+                        </tr>
+                    `;
+                    return;
+                }
+    
+                tbody.innerHTML = ''; // Clear existing rows
+                
+                rankings.forEach((ranking, index) => {
+                    const row = `
+                        <tr>
+                            <td><span class="rank rank-${index + 1}">${index + 1}</span></td>
+                            <td>${ranking.winner}</td>
+                            <td>${ranking.piecesLeft}</td>
+                            <td>${ranking.gameMode}</td>
+                            <td>${ranking.aiDifficulty}</td>
+                            <td>${ranking.score}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Error loading rankings:", error);
+                const tbody = document.querySelector('.ranking-table tbody');
+                if (tbody) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center;">Error loading rankings</td>
+                        </tr>
+                    `;
+                }
+            }
+        }
+    
         initialize() {
             window.addSPABackButton.addBackButtonListener.call(this);
+            this.loadRankings();
         }
     }
 

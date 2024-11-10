@@ -347,16 +347,22 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             if(number_of_black_pieces == 3){
                 black_pieces_free_movement = true
             }
-            if(number_of_red_pieces == 3){
+            else if(number_of_red_pieces == 3){
                 red_pieces_free_movement = true
             }
-            if(number_of_black_pieces == 3 && number_of_red_pieces == 3){
-                console.log("game over")
+            else if(number_of_black_pieces == 3 && number_of_red_pieces == 3){
+                gameOver("Draw")
                 console.log(score())
                 reset()
             }
-            if(number_of_black_pieces < 3 || number_of_red_pieces < 3){
-                console.log("game over")
+            else if(number_of_black_pieces < 3 ){
+                gameOver("Red won the game!")
+                console.log(score())
+                reset()
+              }
+
+            else if(number_of_red_pieces < 3){
+                gameOver("Black won the game")
                 console.log(score())
                 reset()
               }
@@ -378,6 +384,129 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
       resolvePlayerAction = null;
     }
 }
+
+
+function loadRankings() {
+    const rankings = JSON.parse(localStorage.getItem('gameRankings')) || [];
+    const tbody = document.querySelector('.ranking-table tbody');
+    tbody.innerHTML = ''; // Clear existing rows
+    
+    rankings.forEach((ranking, index) => {
+        const row = `
+            <tr>
+                <td><span class="rank rank-${index + 1}">${index + 1}</span></td>
+                <td>${ranking.winner}</td>
+                <td>${ranking.piecesLeft}</td>
+                <td>${ranking.gameMode}</td>
+                <td>${ranking.aiDifficulty}</td>
+                <td>${ranking.score}</td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+}function gameOver(winner) {
+    console.log("Game Over");
+    
+    // Save game info to ranking
+    const gameResult = {
+        winner: winner.includes("Red") ? "Red Player" : 
+                winner.includes("Black") ? (ai_options > 0 ? "Computer" : "Black Player") : 
+                "Draw",
+        piecesLeft: winner.includes("Red") ? number_of_red_pieces : 
+                    winner.includes("Black") ? number_of_black_pieces : 
+                    Math.max(number_of_red_pieces, number_of_black_pieces),
+        gameMode: ai_options > 0 ? "vs Computer" : "vs Player",
+        aiDifficulty: ai_options === 0 ? "-" : 
+                     ai_options === 1 ? "Easy" : 
+                     ai_options === 2 ? "Medium" : "Hard",
+        score: score()
+    };
+
+    // Get existing rankings from localStorage or initialize empty array
+    let rankings = JSON.parse(localStorage.getItem('gameRankings')) || [];
+    
+    // Add new ranking
+    rankings.push(gameResult);
+    
+    // Sort rankings by score (highest first)
+    rankings.sort((a, b) => b.score - a.score);
+    
+    // Keep only top 5 rankings
+    rankings = rankings.slice(0, 5);
+    
+    // Save to localStorage
+    localStorage.setItem('gameRankings', JSON.stringify(rankings));
+    
+    // Rest of your modal code...
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    `;
+
+    // Create modal content
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 90%;
+    `;
+
+    // Add content to modal
+    modalContent.innerHTML = `
+        <h2 style="color: #009579; margin-bottom: 20px;">Game Over!</h2>
+        <p style="font-size: 1.2rem; margin-bottom: 20px;">${winner}</p>
+            <p>Pieces Left: ${gameResult.piecesLeft}</p>
+            <p>Score: ${gameResult.score}</p>
+        </div>
+        <button id="closeModal" style="
+            background-color: #009579;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        ">Back to Menu</button>
+    `;
+
+    // Add modal content to modal container
+    modal.appendChild(modalContent);
+    
+    // Add modal to body
+    document.body.appendChild(modal);
+
+    // Function to handle game end
+    const endGame = () => {
+        document.body.removeChild(modal);
+        reset(); // Reset game state
+        window.location.hash = '#'; // Change URL to #
+    };
+
+    // Close modal when clicking close button
+    document.getElementById('closeModal').addEventListener('click', endGame);
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            endGame();
+        }
+    });
+}
+
 
 function buttonIsValidMove(button){ //checa se o botao clicado eh um movimento valido
     if(valid_moves_list.length == 0){

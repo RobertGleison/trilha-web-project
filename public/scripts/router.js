@@ -61,6 +61,7 @@ window.Router = (function() {
             logoutBtn.addEventListener("click", (e) => {
                 e.preventDefault();
                 localStorage.removeItem('isAuthenticated');
+                localStorage.removeItem('gameRankings');
                 navigateTo('#login');
             });
         }
