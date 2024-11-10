@@ -408,45 +408,10 @@ window.TemplateLoader = {
                     <th>Pieces Left</th>
                     <th>Game Mode</th>
                     <th>AI Difficulty</th>
+                    <th>Score</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Example rows (will be replaced with dynamic data) -->
-                    <tr>
-                    <td><span class="rank rank-1">1</span></td>
-                    <td>Player 1</td>
-                    <td>7</td>
-                    <td>vs AI</td>
-                    <td>Hard</td>
-                    </tr>
-                    <tr>
-                    <td><span class="rank rank-2">2</span></td>
-                    <td>Player 2</td>
-                    <td>5</td>
-                    <td>vs Player</td>
-                    <td>-</td>
-                    </tr>
-                    <tr>
-                    <td><span class="rank rank-3">3</span></td>
-                    <td>AI</td>
-                    <td>6</td>
-                    <td>vs AI</td>
-                    <td>Medium</td>
-                    </tr>
-                    <tr>
-                    <td><span class="rank rank-4">4</span></td>
-                    <td>AI</td>
-                    <td>6</td>
-                    <td>vs AI</td>
-                    <td>Medium</td>
-                    </tr>
-                    <tr>
-                    <td><span class="rank rank-5">5</span></td>
-                    <td>AI</td>
-                    <td>6</td>
-                    <td>vs AI</td>
-                    <td>Medium</td>
-                    </tr>
                 </tbody>
                 </table>
             </div>
@@ -511,8 +476,8 @@ window.TemplateLoader = {
     "game": `
         <div class="game-container">
             <div class="game-info">
-                <span id="current-player">Current Turn: White</span>
-                <span id="game-message">Game in progress - White to move</span>
+                <span id="current-player">Current Turn:</span>
+                <span id="game-message">Game Started</span>
                 <button id="exit-btn">Exit Game</button>
             </div>
 
