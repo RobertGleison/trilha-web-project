@@ -531,9 +531,15 @@ window.TemplateLoader = {
             </div>
 
             <div id="game-screen">
-                <div class="piece-container" id="red-pieces">Red Pieces</div>
-                <div id="board"></div>
-                <div class="piece-container" id="black-pieces">Black Pieces</div>
+                 <div class="side-container">
+                        <span class="player-label">Red Pieces:</span>
+                        <div class="piece-container" id="red-pieces"></div>
+                    </div>
+                    <div id="board"></div>
+                    <div class="side-container">
+                        <span class="player-label">Black Pieces:</span>
+                        <div class="piece-container" id="black-pieces"></div>
+                    </div>
             </div>
             </div>
 
