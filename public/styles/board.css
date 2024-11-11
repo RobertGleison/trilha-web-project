@@ -143,7 +143,7 @@
   
   /* Mill Highlights
   ---------------------------------------- */
-  .is_in_mill_horizontal {
+  /* .is_in_mill_horizontal {
     background-color: lightblue;
     box-shadow: 0 0 20px lightblue;
     transition: background-color 0.3s;
@@ -154,7 +154,7 @@
     box-shadow: 0 0 20px lightgray;
     transition: background-color 0.3s;
   }
-  
+   */
   /* Controls
   ---------------------------------------- */
   #exit-btn {
