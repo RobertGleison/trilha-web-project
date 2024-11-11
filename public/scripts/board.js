@@ -124,6 +124,10 @@ window.Board = (function () {
         return;
       } else {
         console.log("Escolha uma peça válida do oponente para remover.");
+        addGlowEffect("red");
+                setTimeout(() => {
+                    removeGlowEffect();
+                    }, 500);
         return;
       }
     }
@@ -159,6 +163,10 @@ window.Board = (function () {
         return;
       } else {
         console.log("Este espaço já está ocupado. Escolha outro.");
+        addGlowEffect("red");
+                setTimeout(() => {
+                    removeGlowEffect();
+                    }, 500);
         return;
       }
     }
@@ -178,6 +186,10 @@ window.Board = (function () {
           }
           highlightPossibleMoves(possibleMoves);
         } else {
+          addGlowEffect("red");
+                setTimeout(() => {
+                    removeGlowEffect();
+                    }, 500);
           console.log("Selecione uma de suas próprias peças para movimentar.");
         }
       } else {
@@ -190,6 +202,10 @@ window.Board = (function () {
             console.log(
               "Esta peça não tem movimentos possíveis. Selecione outra peça."
             );
+            addGlowEffect("red");
+                setTimeout(() => {
+                    removeGlowEffect();
+                    }, 500);
             selectedPiece = null;
             return;
           }
@@ -217,6 +233,10 @@ window.Board = (function () {
           console.log(
             "Escolha uma posição válida para mover a peça ou selecione outra peça."
           );
+          addGlowEffect("red");
+          setTimeout(() => {
+              removeGlowEffect();
+              }, 500);
           return;
         }
       }
@@ -896,11 +916,6 @@ window.Board = (function () {
     }
 }
 
-  
-  return {
-    run_game,
-  };
-})();
 
 function addGlowEffect(color) {
   //
@@ -930,6 +945,13 @@ function removeGlowEffect() {
     button.classList.remove("glow_red");
   });
 }
+  
+  return {
+    run_game,
+  };
+})();
+
+
 
 
 
