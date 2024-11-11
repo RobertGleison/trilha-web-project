@@ -442,7 +442,7 @@ window.Board = (function () {
     piecesHolder.innerHTML = "";
 
     container.innerHTML = ""; // Limpa peças antigas
-    const pieceImage = playerId.includes("Red")
+    const pieceImage = playerId.includes("red")
       ? "./assets/red_piece.png"
       : "./assets/black_piece.png";
     for (let i = 0; i < count; i++) {
