@@ -4,13 +4,9 @@ import { navigateTo } from "./router.js";
 
 class BaseView {
     constructor() {}
-    setTitle(title) { document.title = title;}
-    async getHtml() { return await TemplateLoader.loadTemplate("base"); 
-        
-
-    }
-    
-  }
+    setTitle(title) { document.title = title; }
+    async getHtml() { return await TemplateLoader.loadTemplate("base"); }
+}
 
 
 
@@ -20,9 +16,9 @@ class HowToPlayView extends BaseView {
         this.setTitle("How to Play");
     }
     async getHtml() { return await TemplateLoader.loadTemplate("how-to-play"); }
-    async initialize() {
-        addSPABackButton.addBackButtonListener.call(this);
-    }}
+    async initialize() { addSPABackButton.addBackButtonListener.call(this); }
+}
+
 
 
 class RulesView extends BaseView {
@@ -30,11 +26,10 @@ class RulesView extends BaseView {
         super();
         this.setTitle("Rules");
     }
-
     async getHtml() { return await TemplateLoader.loadTemplate("rules"); }
-    async initialize() {
-        addSPABackButton.addBackButtonListener.call(this);
-    }}
+    async initialize() { addSPABackButton.addBackButtonListener.call(this); }
+}
+
 
 
 class RankingView extends BaseView {
@@ -42,7 +37,6 @@ class RankingView extends BaseView {
         super();
         this.setTitle("Ranking");
     }
-    
     async getHtml() { return await TemplateLoader.loadTemplate("ranking"); }
     loadRankings() {
         try {
@@ -58,13 +52,11 @@ class RankingView extends BaseView {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="6" style="text-align: center;">No games played yet</td>
-                    </tr>
-                `;
+                    </tr>`;
                 return;
             }
 
-            tbody.innerHTML = ''; // Clear existing rows
-            
+            tbody.innerHTML = '';
             rankings.forEach((ranking, index) => {
                 const row = `
                     <tr>
@@ -94,7 +86,9 @@ class RankingView extends BaseView {
     initialize() {
         addSPABackButton.addBackButtonListener.call(this);
         this.loadRankings();
-    }}
+    }
+}
+
 
 
 class LoginView extends BaseView {
@@ -102,8 +96,8 @@ class LoginView extends BaseView {
         super();
         this.setTitle("Login");
     }
-
     async getHtml() { return await TemplateLoader.loadTemplate("login"); }
+
     handleSubmit(e) {
         e.preventDefault();
         const username = document.getElementById("username").value;
@@ -112,7 +106,7 @@ class LoginView extends BaseView {
         if (username && password) {
             localStorage.setItem("isAuthenticated", "true");
             localStorage.setItem("username", username);
-            navigateTo("/");  // Use window.Router.navigateTo
+            navigateTo("/");
         }
     }
 
@@ -123,6 +117,7 @@ class LoginView extends BaseView {
         }
     }
 
+    // Cleans up event listeners when the view is destroyed.
     cleanup() {
         const form = document.getElementById("authForm");
         if (form) {
@@ -138,12 +133,12 @@ class GameView extends BaseView {
         super();
         this.setTitle("Game");
     }
-
     async getHtml() { return await TemplateLoader.loadTemplate("game-setup"); }
+    
+    // Handles game form options
     async initialize() {
         const gameModeSelect = document.getElementById("gameMode");
 
-        // Add AI difficulty option in form
         if (gameModeSelect) {
             gameModeSelect.addEventListener("change", (e) => {
                 const difficultyGroup = document.getElementById("difficultyGroup");
@@ -152,13 +147,11 @@ class GameView extends BaseView {
             });
         }
 
-        // Form submission handler
         const gameSetupForm = document.getElementById("gameSetupForm");
         if (gameSetupForm) {
             gameSetupForm.addEventListener("submit", async (e) => {
                 e.preventDefault();
 
-                // Collect form data
                 const gameSettings = {
                     gameMode: document.getElementById("gameMode").value,
                     difficulty: document.getElementById("difficulty").value,
@@ -166,16 +159,14 @@ class GameView extends BaseView {
                     firstPlayer: document.getElementById("firstPlayer").value,
                 };
 
-                // Store settings in sessionStorage
                 sessionStorage.setItem("gameSettings", JSON.stringify(gameSettings));
-
-                // Navigate to game page
                 navigateTo("/game");
             });
         }
 
-       addSPABackButton.addBackButtonListener.call(this);}}
-
+        addSPABackButton.addBackButtonListener.call(this);
+    }
+}
 
 
 
@@ -184,7 +175,6 @@ class GameRunnerView extends BaseView {
         super();
         this.setTitle("Nine Men's Morris");
     }
-
     async getHtml() { return await TemplateLoader.loadTemplate("game"); }
     async initialize() {
         try {
@@ -194,12 +184,10 @@ class GameRunnerView extends BaseView {
                 return;
             }
 
-            // Get game settings from sessionStorage
             const gameSettings = JSON.parse(
                 sessionStorage.getItem("gameSettings") || "{}"
             );
 
-            // Add event listeners
             const exitBtn = document.getElementById("exit-btn");
             if (exitBtn) {
                 exitBtn.addEventListener("click", async (e) => {
@@ -209,7 +197,6 @@ class GameRunnerView extends BaseView {
                 });
             }
 
-            // Initial game start
             if (typeof window.Board.run_game === "function") {
                 await window.Board.run_game(gameSettings);
             } else {
@@ -219,7 +206,7 @@ class GameRunnerView extends BaseView {
             console.error("Error initializing game:", error);
         }
     }
-    }
+}
 
 
 
@@ -228,11 +215,7 @@ class NotFoundView extends BaseView {
         super();
         this.setTitle("404 - Page Not Found");
     }
-
-    async getHtml() {
-        return await TemplateLoader.loadTemplate('404');
-    }
-
+    async getHtml() { return await TemplateLoader.loadTemplate('404'); }
     initialize() {
         const homeBtn = document.getElementById("homeBtn");
         const backBtn = document.getElementById("backBtn");
@@ -250,6 +233,7 @@ class NotFoundView extends BaseView {
         }
     }
 
+    // Cleans up event listeners when the view is destroyed.
     cleanup() {
         const homeBtn = document.getElementById("homeBtn");
         const backBtn = document.getElementById("backBtn");
@@ -258,47 +242,56 @@ class NotFoundView extends BaseView {
         backBtn?.removeEventListener("click", this.handleBackClick);
     }
 }
-    
 
 
 
-
+/**
+ * Utility class for loading HTML templates.
+ */
 class TemplateLoader {
+    /**
+     * Loads a template file by name.
+     */
     static async loadTemplate(name) {
         try {
             const response = await fetch(`/templates/${name}.html`);
-            if (!response.ok) { throw new Error(`Failed to load template: ${name}`); }
-        return await response.text();
-    } 
-    
-    catch (error) {
-        console.error("Template loading error:", error);
-        return "";
-    }}}
-
-    
-
-
-    const addSPABackButton = {
-        addBackButtonListener() {
-            const backBtn = document.getElementById("backBtn");
-            if (backBtn) {
-                backBtn.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    navigateTo("/");
-                });
+            if (!response.ok) { 
+                throw new Error(`Failed to load template: ${name}`); 
             }
+            return await response.text();
+        } catch (error) {
+            console.error("Template loading error:", error);
+            return "";
         }
-    };
+    }
+}
+
+
+
+/**
+ * Utility object for adding back button functionality to views.
+ */
+const addSPABackButton = {
+    addBackButtonListener() {
+        const backBtn = document.getElementById("backBtn");
+        if (backBtn) {
+            backBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                navigateTo("/");
+            });
+        }
+    }
+};
+
 
 
 export {
-  BaseView,
-  RulesView,
-  GameView,
-  HowToPlayView,
-  RankingView,
-  GameRunnerView,
-  LoginView,
-  NotFoundView,
+    BaseView,
+    RulesView,
+    GameView,
+    HowToPlayView,
+    RankingView,
+    GameRunnerView,
+    LoginView,
+    NotFoundView,
 };
