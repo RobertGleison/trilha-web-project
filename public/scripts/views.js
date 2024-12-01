@@ -1,5 +1,5 @@
 import { navigateTo } from "./router.js";
-
+import { authService } from "./auth.js";
 
 
 class BaseView {
@@ -98,17 +98,27 @@ class LoginView extends BaseView {
     }
     async getHtml() { return await TemplateLoader.loadTemplate("login"); }
 
-    handleSubmit(e) {
+    async handleSubmit(e) {
         e.preventDefault();
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
 
-        if (username && password) {
-            localStorage.setItem("isAuthenticated", "true");
-            localStorage.setItem("username", username);
+        if (!username || !password) {
+            alert("Please enter both username and password");
+            return;
+        }
+
+        try {
+            await authService.register(username, password);
+            authService.setAuth(true);
+            alert("Login successful!");
             navigateTo("/");
+        } catch (error) {
+            alert(`Login failed: ${error.message}`);
+            console.error('Login error:', error);
         }
     }
+
 
     async initialize() {
         const form = document.getElementById("authForm");
