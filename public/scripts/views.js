@@ -5,7 +5,11 @@ import { navigateTo } from "./router.js";
 class BaseView {
     constructor() {}
     setTitle(title) { document.title = title;}
-    async getHtml() { return await TemplateLoader.loadTemplate("base"); }
+    async getHtml() { return await TemplateLoader.loadTemplate("base"); 
+        
+
+    }
+    
   }
 
 
@@ -16,8 +20,9 @@ class HowToPlayView extends BaseView {
         this.setTitle("How to Play");
     }
     async getHtml() { return await TemplateLoader.loadTemplate("how-to-play"); }
-    async initialize() { addSPABackButton.addBackButtonListener.call(this); }}
-
+    async initialize() {
+        addSPABackButton.addBackButtonListener.call(this);
+    }}
 
 
 class RulesView extends BaseView {
@@ -27,8 +32,9 @@ class RulesView extends BaseView {
     }
 
     async getHtml() { return await TemplateLoader.loadTemplate("rules"); }
-    async initialize() { addSPABackButton.addBackButtonListener.call(this); }}
-
+    async initialize() {
+        addSPABackButton.addBackButtonListener.call(this);
+    }}
 
 
 class RankingView extends BaseView {
@@ -38,8 +44,57 @@ class RankingView extends BaseView {
     }
     
     async getHtml() { return await TemplateLoader.loadTemplate("ranking"); }
-    initialize() { addSPABackButton.addBackButtonListener.call(this); }}    
+    loadRankings() {
+        try {
+            const rankings = JSON.parse(localStorage.getItem('gameRankings')) || [];
+            const tbody = document.querySelector('.ranking-table tbody');
+            
+            if (!tbody) {
+                console.error("Ranking table not found");
+                return;
+            }
 
+            if (rankings.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No games played yet</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = ''; // Clear existing rows
+            
+            rankings.forEach((ranking, index) => {
+                const row = `
+                    <tr>
+                        <td><span class="rank rank-${index + 1}">${index + 1}</span></td>
+                        <td>${ranking.winner}</td>
+                        <td>${ranking.piecesLeft}</td>
+                        <td>${ranking.gameMode}</td>
+                        <td>${ranking.aiDifficulty}</td>
+                        <td>${ranking.score}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        } catch (error) {
+            console.error("Error loading rankings:", error);
+            const tbody = document.querySelector('.ranking-table tbody');
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">Error loading rankings</td>
+                    </tr>
+                `;
+            }
+        }
+    }
+
+    initialize() {
+        addSPABackButton.addBackButtonListener.call(this);
+        this.loadRankings();
+    }}
 
 
 class LoginView extends BaseView {
@@ -49,24 +104,29 @@ class LoginView extends BaseView {
     }
 
     async getHtml() { return await TemplateLoader.loadTemplate("login"); }
-    async initialize() {
-        document.getElementById("authForm").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
+    handleSubmit(e) {
+        e.preventDefault();
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
 
-            if (username && password) {
-                localStorage.setItem("isAuthenticated", "true");
-                localStorage.setItem("username", username);
-                navigateTo("/"); // Use navigateTo instead of this.router.navigate
-            }
-        });
+        if (username && password) {
+            localStorage.setItem("isAuthenticated", "true");
+            localStorage.setItem("username", username);
+            navigateTo("/");  // Use window.Router.navigateTo
+        }
+    }
+
+    async initialize() {
+        const form = document.getElementById("authForm");
+        if (form) {
+            form.addEventListener("submit", this.handleSubmit);
+        }
     }
 
     cleanup() {
         const form = document.getElementById("authForm");
         if (form) {
-        form.removeEventListener("submit", this.handleSubmit);
+            form.removeEventListener("submit", this.handleSubmit);
         }
     }
 }
@@ -83,38 +143,39 @@ class GameView extends BaseView {
     async initialize() {
         const gameModeSelect = document.getElementById("gameMode");
 
-        // Add  AI difficulty option in form
+        // Add AI difficulty option in form
         if (gameModeSelect) {
-        gameModeSelect.addEventListener("change", (e) => {
-            const difficultyGroup = document.getElementById("difficultyGroup");
-            difficultyGroup.style.display =
-            e.target.value === "pvc" ? "flex" : "none";
-        });}
+            gameModeSelect.addEventListener("change", (e) => {
+                const difficultyGroup = document.getElementById("difficultyGroup");
+                difficultyGroup.style.display =
+                    e.target.value === "pvc" ? "flex" : "none";
+            });
+        }
 
-        
         // Form submission handler
         const gameSetupForm = document.getElementById("gameSetupForm");
         if (gameSetupForm) {
-        gameSetupForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
+            gameSetupForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
 
-            // Collect form data
-            const gameSettings = {
-            gameMode: document.getElementById("gameMode").value,
-            difficulty: document.getElementById("difficulty").value,
-            boardSize: document.getElementById("boardSize").value,
-            firstPlayer: document.getElementById("firstPlayer").value,
-            };
+                // Collect form data
+                const gameSettings = {
+                    gameMode: document.getElementById("gameMode").value,
+                    difficulty: document.getElementById("difficulty").value,
+                    boardSize: document.getElementById("boardSize").value,
+                    firstPlayer: document.getElementById("firstPlayer").value,
+                };
 
-            // Store settings in sessionStorage
-            sessionStorage.setItem("gameSettings", JSON.stringify(gameSettings));
+                // Store settings in sessionStorage
+                sessionStorage.setItem("gameSettings", JSON.stringify(gameSettings));
 
-            // Navigate to game page
-            navigateTo("/game");
-        });
+                // Navigate to game page
+                navigateTo("/game");
+            });
         }
 
-        addSPABackButton.addBackButtonListener.call(this);}}
+       addSPABackButton.addBackButtonListener.call(this);}}
+
 
 
 
@@ -127,39 +188,38 @@ class GameRunnerView extends BaseView {
     async getHtml() { return await TemplateLoader.loadTemplate("game"); }
     async initialize() {
         try {
-        const boardElement = document.getElementById("board");
-        if (!boardElement) {
-            console.error("Board element not found");
-            return;
+            const boardElement = document.getElementById("board");
+            if (!boardElement) {
+                console.error("Board element not found");
+                return;
+            }
+
+            // Get game settings from sessionStorage
+            const gameSettings = JSON.parse(
+                sessionStorage.getItem("gameSettings") || "{}"
+            );
+
+            // Add event listeners
+            const exitBtn = document.getElementById("exit-btn");
+            if (exitBtn) {
+                exitBtn.addEventListener("click", async (e) => {
+                    e.preventDefault();
+                    sessionStorage.removeItem("gameSettings");
+                    navigateTo("/");
+                });
+            }
+
+            // Initial game start
+            if (typeof window.Board.run_game === "function") {
+                await window.Board.run_game(gameSettings);
+            } else {
+                console.error("run_game function not found in board module");
+            }
+        } catch (error) {
+            console.error("Error initializing game:", error);
         }
-
-        // Get game settings from sessionStorage
-        const gameSettings = JSON.parse(
-            sessionStorage.getItem("gameSettings") || "{}"
-        );
-
-        // Import board module
-        const boardModule = await import("./board.js");
-
-        // Add event listeners
-        const exitBtn = document.getElementById("exit-btn");
-        if (exitBtn) {
-            exitBtn.addEventListener("click", async (e) => {
-            e.preventDefault();
-            sessionStorage.removeItem("gameSettings");
-            navigateTo("/");
-            });
-        }
-
-        // Initial game start
-        if (typeof boardModule.run_game === "function") { await boardModule.run_game(gameSettings); } 
-        else { console.error("run_game function not found in board module"); }
-        } 
-        
-        catch (error) {
-        console.error("Error initializing game:", error);
-        }
-    }}
+    }
+    }
 
 
 
@@ -216,16 +276,20 @@ class TemplateLoader {
         return "";
     }}}
 
+    
 
 
-const addSPABackButton = {
-    addBackButtonListener() {
-        const backBtn = document.getElementById("backBtn");
-        if (backBtn) {
-            backBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            navigateTo("/");
-        });}},};
+    const addSPABackButton = {
+        addBackButtonListener() {
+            const backBtn = document.getElementById("backBtn");
+            if (backBtn) {
+                backBtn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    navigateTo("/");
+                });
+            }
+        }
+    };
 
 
 export {

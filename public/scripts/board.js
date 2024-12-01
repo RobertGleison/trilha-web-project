@@ -1,4 +1,6 @@
-/*INSTRUÇÕES 
+
+window.Board = (function() {
+    /*INSTRUÇÕES 
 Para alterar as configuraçoes inicias do board sera necessario alterar as variaveis globais de acordo com o desejado,
 por exemplo se quiser que as black pieces comecem e tenham a dificuldade easy deve chamar a função opponentStarts()
 e colocar o ai_options como 1, é importante destacar que nenhuma das declarações das variaveis globais devem ser alteradas
@@ -24,7 +26,7 @@ let selection_success = true; // variavel para determinar o sucesso de um loop n
 let no_selected_button = true; //variavel para auxiliar a mover as peças na fase de mover
 let move_phase = false; // variavel para determinar se esta na fase de mover as peças
 let valid_moves_list = [] // lista de movimentos validos dado um certo botao/casa
-// let n = 2; // numero de quadrados no board
+let n = 4; // numero de quadrados no board
 let choose_piece = false //retirar peças do board
 let number_of_red_pieces = 0 // numero de peças vermelhas
 let number_of_black_pieces = 0 // numero de peças pretas
@@ -33,6 +35,30 @@ let red_pieces_free_movement = false // indica se as peças vermelhas podem se m
 let ai_options = 0 // escolhe a dificuldade da ai 0: 2 players 1: easy 2: medium 3:hard
 let flag_start = false // para indicar se o primeiro move deve ser a ai que faz
 /*----------------------------------------------------------------------------------------------*/
+
+function updateturn(){
+    const currentPlayerElement = document.getElementById("current-player");
+    const currentPlayerMessage = document.getElementById("game-message");
+    if(is_player_red){
+        currentPlayerElement.textContent = "Current Turn: Red";
+        currentPlayerMessage.textContent = "Game in progress - Red to move"
+    }
+    else{
+        currentPlayerElement.textContent = "Current Turn: Black";
+        currentPlayerMessage.textContent = "Game in progress - Black to move"
+    }
+}
+
+
+function updateRemovingPiece(player){
+    const currentPlayerMessage = document.getElementById("game-message");
+    if(player === "Red"){
+        currentPlayerMessage.textContent = "Game in progress - Remove Black Piece"
+    }
+    else{
+        currentPlayerMessage.textContent = "Game in progress - Remove Red Piece"
+    }
+}
 
 function opponentStarts(){ // para as pecas pretas comecarem jogando //
     is_player_red = false
@@ -97,6 +123,14 @@ function aiEasyRemove(){ // para a ai remover as pecas
             valid_moves_list.push(button.id)
         }
       });
+    if(valid_moves_list.length == 0){
+        buttons.forEach(button => {
+            var id = button.id.split('').map(Number);
+            if(game_list[id[0]-1][id[1]-1] == 'red'){
+                valid_moves_list.push(button.id)
+            }
+          });
+    }
     let index = getRandomInt(valid_moves_list.length)
     return valid_moves_list[index].toString()
 }
@@ -116,7 +150,6 @@ function reset(){ // reseta o board //
     number_of_black_pieces = 0 // numero de peças pretas
     black_pieces_free_movement = false
     red_pieces_free_movement = false
-    run_game()
 }
 
 function delay(ms) { // delay para esperar acao do jogador
@@ -196,7 +229,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
     if (placing_pieces && !choose_piece) {
         const id = button.id.split('').map(Number);
         if(is_player_red && (game_list[id[0]-1][id[1]-1] == 'empty')){
-            button.style.backgroundImage = 'url("../assets/red_piece.png")'; // Altera para a imagem do checker
+            button.style.backgroundImage = 'url("./assets/red_piece.png")'; // Altera para a imagem do checker
             button.classList.add('selected'); // Marca o botão como selecionado para evitar cliques duplicados
             const id = button.id.split('').map(Number);
             game_list[id[0]-1][id[1]-1] = 'red'
@@ -204,9 +237,10 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             removePile("red-pieces");  
             button.classList.remove('selected');
             selection_success = true
+            updateturn()
         }
         else if (game_list[id[0]-1][id[1]-1] == 'empty'){
-            button.style.backgroundImage = 'url("../assets/black_piece.png")'; // Altera para a imagem do checker
+            button.style.backgroundImage = 'url("./assets/black_piece.png")'; // Altera para a imagem do checker
             button.classList.add('selected'); // Marca o botão como selecionado para evitar cliques duplicados
             const id = button.id.split('').map(Number);
             game_list[id[0]-1][id[1]-1] = 'black'
@@ -214,6 +248,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             removePile("black-pieces");
             button.classList.remove('selected');
             selection_success = true
+            updateturn()
         }
         else{
             selection_success = false
@@ -267,17 +302,19 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
                 pbutton.style.backgroundImage = 'none'
                 if(is_player_red){
                     game_list[id[0]-1][id[1]-1] = 'red'
-                    button.style.backgroundImage = 'url("../assets/red_piece.png")';
+                    button.style.backgroundImage = 'url("./assets/red_piece.png")';
                     is_player_red = false 
                     removeGlowEffect()
                     no_selected_button = true
+                    updateturn()
                 }
                 else{
                     game_list[id[0]-1][id[1]-1] = 'black'
-                    button.style.backgroundImage = 'url("../assets/black_piece.png")'; 
+                    button.style.backgroundImage = 'url("./assets/black_piece.png")'; 
                     is_player_red = true
                     removeGlowEffect()
                     no_selected_button = true
+                    updateturn()
                 }
                 checkBoard()
             }
@@ -310,22 +347,29 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
             if(number_of_black_pieces == 3){
                 black_pieces_free_movement = true
             }
-            if(number_of_red_pieces == 3){
+            else if(number_of_red_pieces == 3){
                 red_pieces_free_movement = true
             }
-            if(number_of_black_pieces == 3 && number_of_red_pieces == 3){
-                console.log("game over")
+            else if(number_of_black_pieces == 3 && number_of_red_pieces == 3){
+                gameOver("Draw")
                 console.log(score())
                 reset()
             }
-            if(number_of_black_pieces < 3 || number_of_red_pieces < 3){
-                console.log("game over")
+            else if(number_of_black_pieces < 3 ){
+                gameOver("Red won the game!")
+                console.log(score())
+                reset()
+              }
+
+            else if(number_of_red_pieces < 3){
+                gameOver("Black won the game")
                 console.log(score())
                 reset()
               }
             move_phase = true
             choose_piece = false
             selection_success = true
+            updateturn()
        }
        else{
             addGlowEffect("red");
@@ -340,6 +384,129 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
       resolvePlayerAction = null;
     }
 }
+
+
+function loadRankings() {
+    const rankings = JSON.parse(localStorage.getItem('gameRankings')) || [];
+    const tbody = document.querySelector('.ranking-table tbody');
+    tbody.innerHTML = ''; // Clear existing rows
+    
+    rankings.forEach((ranking, index) => {
+        const row = `
+            <tr>
+                <td><span class="rank rank-${index + 1}">${index + 1}</span></td>
+                <td>${ranking.winner}</td>
+                <td>${ranking.piecesLeft}</td>
+                <td>${ranking.gameMode}</td>
+                <td>${ranking.aiDifficulty}</td>
+                <td>${ranking.score}</td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+}function gameOver(winner) {
+    console.log("Game Over");
+    
+    // Save game info to ranking
+    const gameResult = {
+        winner: winner.includes("Red") ? "Red Player" : 
+                winner.includes("Black") ? (ai_options > 0 ? "Computer" : "Black Player") : 
+                "Draw",
+        piecesLeft: winner.includes("Red") ? number_of_red_pieces : 
+                    winner.includes("Black") ? number_of_black_pieces : 
+                    Math.max(number_of_red_pieces, number_of_black_pieces),
+        gameMode: ai_options > 0 ? "vs Computer" : "vs Player",
+        aiDifficulty: ai_options === 0 ? "-" : 
+                     ai_options === 1 ? "Easy" : 
+                     ai_options === 2 ? "Medium" : "Hard",
+        score: score()
+    };
+
+    // Get existing rankings from localStorage or initialize empty array
+    let rankings = JSON.parse(localStorage.getItem('gameRankings')) || [];
+    
+    // Add new ranking
+    rankings.push(gameResult);
+    
+    // Sort rankings by score (highest first)
+    rankings.sort((a, b) => b.score - a.score);
+    
+    // Keep only top 5 rankings
+    rankings = rankings.slice(0, 5);
+    
+    // Save to localStorage
+    localStorage.setItem('gameRankings', JSON.stringify(rankings));
+    
+    // Rest of your modal code...
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    `;
+
+    // Create modal content
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 90%;
+    `;
+
+    // Add content to modal
+    modalContent.innerHTML = `
+        <h2 style="color: #009579; margin-bottom: 20px;">Game Over!</h2>
+        <p style="font-size: 1.2rem; margin-bottom: 20px;">${winner}</p>
+            <p>Pieces Left: ${gameResult.piecesLeft}</p>
+            <p>Score: ${gameResult.score}</p>
+        </div>
+        <button id="closeModal" style="
+            background-color: #009579;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        ">Back to Menu</button>
+    `;
+
+    // Add modal content to modal container
+    modal.appendChild(modalContent);
+    
+    // Add modal to body
+    document.body.appendChild(modal);
+
+    // Function to handle game end
+    const endGame = () => {
+        document.body.removeChild(modal);
+        reset(); // Reset game state
+        window.location.hash = '#'; // Change URL to #
+    };
+
+    // Close modal when clicking close button
+    document.getElementById('closeModal').addEventListener('click', endGame);
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            endGame();
+        }
+    });
+}
+
 
 function buttonIsValidMove(button){ //checa se o botao clicado eh um movimento valido
     if(valid_moves_list.length == 0){
@@ -763,6 +930,7 @@ function checkBoard(){ //checa os mills do board
 function removePiece(color){ //remove uma piece
     if(color == "black"){
         console.log("mill_black")
+        updateRemovingPiece("Red")
         choose_piece = true
         if(placing_pieces){
             removeGlowEffect()
@@ -778,6 +946,7 @@ function removePiece(color){ //remove uma piece
     }
     else if(color == "red"){
         console.log("mill_red")
+        updateRemovingPiece("Black")
         move_phase = false
         choose_piece = true
         if(placing_pieces){
@@ -889,27 +1058,37 @@ function removeGlowEffect() { //
     });
   }
   // Run the function with a specified number of squares
-export async function run_game(gameSettings){
-    const boardSize = gameSettings.boardSize;
+async function run_game(gameSettings = {}){
+    const exitButton = document.getElementById("exit-btn"); //para resetar o jogo quando sai da pagina
 
+    exitButton.addEventListener("click", function() {
+        reset()
+    });
   /*NAO MUDAR
   --------------------------------------  */
-  createSquares(boardSize);
-  const numPieces = 3 * boardSize;
+  n = gameSettings.boardSize;
+  if(gameSettings.firstPlayers == "player2"){
+    opponentStarts()
+  }
+  if(gameSettings.gameMode == "pvp"){
+    ai_options = 0
+  }
+  else if(gameSettings.gameMode == "pvc"){
+    ai_options = 1
+  }
+  createSquares(n);
+  const numPieces = 3 * n;
   number_of_black_pieces =  numPieces
   number_of_red_pieces = numPieces
   //---------------------------------------
-  ai_options = 0
-  //opponentStarts()
-  setupPieces("red-pieces", "../assets/red_piece.png", numPieces);
-  setupPieces("black-pieces", "../assets/black_piece.png", numPieces);
+  setupPieces("red-pieces", "./assets/red_piece.png", numPieces);
+  setupPieces("black-pieces", "./assets/black_piece.png", numPieces);
   placePiecesHuman()
 }
 
-
-// const boardSize = gameSettings.boardSize;
-//     const gameMode = gameSettings.gameMode;
-//     const difficulty = gameSettings.difficulty;
-//     const firstPlayer = gameSettings.firstPlayer;
+  return {
+    run_game
+};
+})();
 
 
