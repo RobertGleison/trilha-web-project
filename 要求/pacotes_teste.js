@@ -60,54 +60,66 @@ Função para sair de um jogo, importante notar que apos 2 minutos um leave é e
 async function requestLeave(nick, password, game){
     const response = await fetch('http://twserver.alunos.dcc.fc.up.pt:8008/leave', {
         method: 'POST',
-        body: JSON.stringify({group,nick, password, game})
+        body: JSON.stringify({nick, password, game})
     })
-    /* para testar o sucesso de envio
-    if(response.ok){
-        alert("success")
-    }
-    else{
-        alert("Error, bad request")
-    }
-    */
 }
 /*-----------------------------------------------------------------------------------------
 Debugging nao feito*/
 
 /*----------------------------------------------------------------------------------------
 Função para enviar ao servidor uma jogada*/ 
-async function requestNotify(nick, password, game, move){
-    const response = await fetch('http://twserver.alunos.dcc.fc.up.pt:8008/notify', {
-        method: 'POST',
-        body: JSON.stringify({nick, password, game, move})
-    })
-    /* para testar o sucesso de envio
-    if(response.ok){
-        alert("success")
+async function requestNotify(nick, password, game, square, position) {
+    const cell = { square, position };
+    
+    try {
+        const response = await fetch('http://twserver.alunos.dcc.fc.up.pt:8008/notify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ nick, password, game, cell })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error("Error in requestNotify:", error);
     }
-    else{
-        alert("Error, bad request")
-    }
-    */
 }
+
 /*-----------------------------------------------------------------------------------------
 Debugging nao feito*/
 
 /*----------------------------------------------------------------------------------------
 Função para autualizar o tabuleiro do jogo*/ 
-async function requestUpdate(nick, game){
-    const response = await fetch(`http://twserver.alunos.dcc.fc.up.pt:8008/update?nick=${nick}&game=${game}`, {
-        method: 'GET',
-    })
-    // /* para testar o sucesso de envio
-    if(response.ok){
-        alert("Success")
+function requestUpdate(game, nick) {
+    const params = new URLSearchParams({ game, nick });
+    const url = `http://twserver.alunos.dcc.fc.up.pt:8008/update?${params.toString()}`;
+    
+    try {
+        const eventSource = new EventSource(url);
+
+        eventSource.onmessage = (event) => {
+            if (event.data.startsWith("winner:")) {
+                const winner = event.data.split(":")[1].trim();
+                console.log(`Game over. Winner: ${winner}`);
+                eventSource.close();
+            } else {
+                console.log("Game stats:", event.data);
+            }
+        };
+
+        eventSource.onerror = () => {
+            console.error("Connection error.");
+            eventSource.close();
+        };
+
+    } catch (error) {
+        console.error("Erro ao inicializar EventSource:", error);
     }
-    else{
-        alert("Error, bad request")
-    }
-    // */
 }
+
 /*-----------------------------------------------------------------------------------------
 Debugging feito, no caso de nao existir o jogo o codigo funciona*/
 
@@ -149,16 +161,31 @@ em termos praticos significa: colocar um await na frente do nome da função cha
 
 async function main() {
     try {
-        await requestRegister("Eris!", "eriswasekainoichibankirei"); 
-        const teste = await requestJoin(24, "Eris!", "eriswasekainoichibankirei", 3); 
+        await requestRegister("Roxy!", "mizumajutsushi"); 
+        const teste = await requestJoin(24,"Roxy!", "mizumajutsushi", 3); 
         console.log('Response from requestJoin:', teste); 
-        const teste_rankings = await requestRanking(24, 5)
-        console.log(`Response from requestRankings`, teste_rankings)
+        requestUpdate(String(teste.game), "Eris!");
     } catch (error) {
         console.error('An error occurred in main:', error.message);
     }
+    try {
+        await requestRegister("Eris!", "eriswasekainoichibankirei"); 
+        const teste = await requestJoin(24, "Eris!", "eriswasekainoichibankirei", 3); 
+        console.log('Response from requestJoin:', teste); 
+        await requestNotify("Roxy!", "mizumajutsushi", String(teste.game), 0, 0)
+        //const teste_rankings = await requestRanking(24, 5)
+        //console.log(`Response from requestRankings`, teste_rankings)
+        await requestNotify("Eris!", "eriswasekainoichibankirei", String(teste.game), 0, 5)
+        await requestNotify("Roxy!", "mizumajutsushi", String(teste.game), 0, 1)
+        await requestNotify("Eris!", "eriswasekainoichibankirei", String(teste.game), 0, 6)
+        await requestNotify("Roxy!", "mizumajutsushi", String(teste.game), 0, 2)
+    } catch (error) {
+        console.error('An error occurred in main:', error.message);
+    }
+   
 }
 main();
+
 
 
 
