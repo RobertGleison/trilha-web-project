@@ -64,7 +64,7 @@ async function requestLeave(nick, password, game){
     })
 }
 /*-----------------------------------------------------------------------------------------
-Debugging nao feito*/
+Debugging feito*/
 
 /*----------------------------------------------------------------------------------------
 Função para enviar ao servidor uma jogada*/ 
@@ -89,7 +89,7 @@ async function requestNotify(nick, password, game, square, position) {
 }
 
 /*-----------------------------------------------------------------------------------------
-Debugging nao feito*/
+Debugging feito*/
 
 /*----------------------------------------------------------------------------------------
 Função para autualizar o tabuleiro do jogo*/ 
@@ -121,7 +121,7 @@ function requestUpdate(game, nick) {
 }
 
 /*-----------------------------------------------------------------------------------------
-Debugging feito, no caso de nao existir o jogo o codigo funciona*/
+Debugging feito*/
 
 /*----------------------------------------------------------------------------------------
 Função retorna a tabela de classificação com os top 10 jogadores*/ 
