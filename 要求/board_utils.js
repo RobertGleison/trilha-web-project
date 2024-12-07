@@ -24,7 +24,11 @@ export class BoardUtils{
        do board usado na logica do jogo no board*/
     convertBoardFormat(serverboard){
         const newboard = serverboard
+        let temp = null
         for(let i = 0;i < serverboard.length; i++){
+            newboard[i][0] = serverboard[i][0]
+            newboard[i][1] = serverboard[i][1]
+            newboard[i][2] = serverboard[i][2]
             newboard[i][3] = serverboard[i][7]
             newboard[i][4] = serverboard[i][3]
             newboard[i][5] = serverboard[i][6]
@@ -106,12 +110,23 @@ export class BoardUtils{
             console.log("Tile clicked:", event.target.id);
             const id= event.target.id.split('').map(Number);
             console.log(this.game_info)
+            id[1] = this.convertSingleButton(id[1])
             this.serverRequests.requestNotify(this.login, this.senha, String(this.game_info), id[0]-1, id[1]-1)
         }
         else if(this.data.phase == "move"){
-            
+            console.log("Tile clicked:", event.target.id);
+            const id= event.target.id.split('').map(Number);
+            console.log(this.game_info)
+            id[1] = this.convertSingleButton(id[1])
+            this.serverRequests.requestNotify(this.login, this.senha, String(this.game_info), id[0]-1, id[1]-1)
         }
-        else if(this.data.phase == "remove"){}
+        else if(this.data.phase == "remove"){
+            console.log("Tile clicked:", event.target.id);
+            const id= event.target.id.split('').map(Number);
+            console.log(this.game_info)
+            id[1] = this.convertSingleButton(id[1])
+            this.serverRequests.requestNotify(this.login, this.senha, String(this.game_info), id[0]-1, id[1]-1)
+        }
     }
 
     addGlowEffect(color, id) { //
