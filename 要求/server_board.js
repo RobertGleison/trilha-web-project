@@ -44,6 +44,7 @@ const boardUtils = new BoardUtils(serverRequests, login, senha, null, null);
 boardUtils.createSquares(game_size)
 const processCollectedData = serverRequests.processDataPeriodically((data) => {
     boardUtils.removeGlowEffect();
+    data.board = boardUtils.convertBoardFormat(data.board)
     boardUtils.redrawBoard(data.board);
     if(data.turn != boardUtils.login){
         return;  
@@ -101,4 +102,5 @@ async function teste_multiplayer(){
     }
 }
 //teste_singleplayer()
+teste_multiplayer()
 
