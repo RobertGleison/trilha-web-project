@@ -1,4 +1,4 @@
-import * as serverRequests from "./pacotes_teste.js" 
+import * as serverRequests from "./serverRequests.js" 
 import {BoardUtils} from "./board_utils.js"
 
 /**
@@ -41,8 +41,7 @@ function addColorToNeighbors(data){
         });
 }
 const boardUtils = new BoardUtils(serverRequests, login, senha, null, null);
-boardUtils.createSquares(game_size)
-
+// boardUtils.createSquares(game_size)
 
 const processCollectedData = serverRequests.processDataPeriodically((data) => {
     boardUtils.removeGlowEffect();

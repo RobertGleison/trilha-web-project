@@ -12,7 +12,7 @@ function navigateTo(url) {
  * Checks if a user is authenticated.
  */
 function isAuthenticated() {
-    return localStorage.getItem('isAuthenticated') === 'true';
+    return sessionStorage.getItem('isAuthenticated') === 'true';
 }
 
 
@@ -48,7 +48,8 @@ const router = async () => {
         { path: "/game-setup", view: views.GameView },
         { path: "/how-to-play", view: views.HowToPlayView },
         { path: "/ranking", view: views.RankingView },
-        { path: "/game", view: views.GameRunnerView }
+        { path: "/game", view: views.GameRunnerView },
+        { path: "/game-online", view: views.GameRunnerServerView },
     ];
 
     // Map routes to potential matches
@@ -96,7 +97,7 @@ const router = async () => {
  * Handles initial authentication state and navigation.
  */
 function loadInitialContent() {
-    localStorage.removeItem('isAuthenticated');
+    sessionStorage.removeItem('isAuthenticated');
     
     // Set up click handlers for navigation links
     document.body.addEventListener("click", e => {
@@ -121,7 +122,7 @@ const logout = () => {
     if (logoutBtn) {
         logoutBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            localStorage.removeItem('isAuthenticated');
+            sessionStorage.removeItem('isAuthenticated');
             navigateTo("/login");
         });
     }

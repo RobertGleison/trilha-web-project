@@ -1,6 +1,11 @@
 import { navigateTo } from "./router.js";
 import { authService } from "./auth.js";
+import * as requests from "./serverRequests.js"
+import {BoardUtils} from "./board_utils.js"
 
+const GROUP = 24;
+let NICKNAME;
+let PASSWORD;
 
 class BaseView {
     constructor() {}
@@ -40,7 +45,7 @@ class RankingView extends BaseView {
     async getHtml() { return await TemplateLoader.loadTemplate("ranking"); }
     loadRankings() {
         try {
-            const rankings = JSON.parse(localStorage.getItem('gameRankings')) || [];
+            const rankings = JSON.parse(sessionStorage.getItem('gameRankings')) || [];
             const tbody = document.querySelector('.ranking-table tbody');
             
             if (!tbody) {
@@ -102,6 +107,10 @@ class LoginView extends BaseView {
         e.preventDefault();
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
+        sessionStorage.setItem("nickname", username);
+        sessionStorage.setItem("password", password);
+        NICKNAME = sessionStorage.getItem("nickname");
+        PASSWORD = sessionStorage.getItem("password");
 
         if (!username || !password) {
             alert("Please enter both username and password");
@@ -157,6 +166,14 @@ class GameView extends BaseView {
             });
         }
 
+        if (gameModeSelect) {
+            gameModeSelect.addEventListener("change", (e) => {
+                const firstPlayer = document.getElementById("firstPlayer");
+                firstPlayer.style.display =
+                    e.target.value === "pvpo" ? "none" : "flex";
+            });
+        }
+
         const gameSetupForm = document.getElementById("gameSetupForm");
         if (gameSetupForm) {
             gameSetupForm.addEventListener("submit", async (e) => {
@@ -168,9 +185,19 @@ class GameView extends BaseView {
                     boardSize: document.getElementById("boardSize").value,
                     firstPlayer: document.getElementById("firstPlayer").value,
                 };
-
+                
                 sessionStorage.setItem("gameSettings", JSON.stringify(gameSettings));
-                navigateTo("/game");
+                if (gameMode === "pvpo"){
+                    try {
+                        const gameCode = await requests.requestJoin(GROUP, NICKNAME, PASSWORD, gameSettings.boardSize);
+                        sessionStorage.setItem("game", gameCode.game)
+                        navigateTo("/game-online");
+                    }
+                    catch(error) { console.log("Error in join method", error) }
+                }    
+                else {
+                    console.log("Entrei no jogo local");
+                    navigateTo("/game");}
             });
         }
 
@@ -202,13 +229,23 @@ class GameRunnerView extends BaseView {
             if (exitBtn) {
                 exitBtn.addEventListener("click", async (e) => {
                     e.preventDefault();
-                    sessionStorage.removeItem("gameSettings");
+                    
                     navigateTo("/");
                 });
             }
 
             if (typeof window.Board.run_game === "function") {
+                
+                
+                if (gameSettings === null) console.log("gameSettings is null");
+
+                console.log(gameSettings.boardSize);
+                console.log(gameSettings.gameMode);
+                console.log(gameSettings.difficulty);
+                console.log(gameSettings.firstPlayer);
+
                 await window.Board.run_game(gameSettings);
+
             } else {
                 console.error("run_game function not found in board module");
             }
@@ -218,6 +255,51 @@ class GameRunnerView extends BaseView {
     }
 }
 
+
+
+class GameRunnerServerView extends BaseView {
+    constructor() {
+        super();
+        this.setTitle("Nine Men's Morris");
+    }
+    async getHtml() { return await TemplateLoader.loadTemplate("game"); }
+    async initialize() {
+        try {
+            const boardElement = document.getElementById("board");
+            if (!boardElement) {
+                console.error("Board element not found");
+                return;
+            }
+
+            const game = sessionStorage.getItem("game")
+
+            serverRequests.requestUpdate(
+                sessionStorage.getItem("game"),
+                NICKNAME, 
+                serverRequests.processDataPeriodically(processCollectedData)
+            )
+
+            const exitBtn = document.getElementById("exit-btn");
+            if (exitBtn) {
+                exitBtn.addEventListener("click", async (e) => {
+                    e.preventDefault();
+                    sessionStorage.removeItem("gameSettings");
+                    requests.requestLeave(NICKNAME, PASSWORD, game);
+                    sessionStorage.removeItem("game");
+                    navigateTo("/");
+                });
+            }
+
+            if (typeof window.Board.run_game === "function") {
+                // await window.Board.run_game(gameSettings);
+            } else {
+                console.error("run_game function not found in board module");
+            }
+        } catch (error) {
+            console.error("Error initializing game:", error);
+        }
+    }
+}
 
 
 class NotFoundView extends BaseView {
@@ -295,6 +377,29 @@ const addSPABackButton = {
 
 
 
+
+const processCollectedData = requests.processDataPeriodically((data) => {
+    boardUtils.removeGlowEffect();
+    data.board = boardUtils.convertBoardFormat(data.board)
+    boardUtils.redrawBoard(data.board);
+    if(data.turn != boardUtils.login){
+        return;  
+    }
+    console.log("Processed data:", data.board);
+    boardUtils.data = data;
+    if(data.phase == "move" || data.step == "from"){
+        addColorToOwnPieces(data)
+    }
+    else if(data.phase == "move" || data.step == "to"){
+        addColorToNeighbors(data);
+    }
+    else if(data.phase == "move" || data.step == "take"){
+        
+    }
+});
+
+
+
 export {
     BaseView,
     RulesView,
@@ -302,6 +407,7 @@ export {
     HowToPlayView,
     RankingView,
     GameRunnerView,
+    GameRunnerServerView,
     LoginView,
     NotFoundView,
 };

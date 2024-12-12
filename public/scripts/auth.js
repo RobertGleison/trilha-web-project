@@ -3,15 +3,23 @@ const API_URL = 'http://twserver.alunos.dcc.fc.up.pt:8008';
 const authService = {
     // Local storage management
     isAuthenticated() {
-        return localStorage.getItem('isAuthenticated') === 'true';
+        return sessionStorage.getItem('isAuthenticated') === 'true';
     },
 
     clearAuth() {
-        localStorage.removeItem('isAuthenticated');
+        sessionStorage.removeItem('isAuthenticated');
     },
 
     setAuth(value) {
-        localStorage.setItem('isAuthenticated', value);
+        sessionStorage.setItem('isAuthenticated', value);
+    },
+
+    setNickname(value) {
+        sessionStorage.setItem('nickname', value);
+    },
+
+    setPassword(value) {
+        sessionStorage.setItem('password', value);
     },
 
     // API calls
@@ -26,7 +34,9 @@ const authService = {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Registration failed');
             }
-
+            
+            this.setNickname(nick);
+            this.setPassword(password);
             return await response.json();
         } catch (error) {
             throw error;
