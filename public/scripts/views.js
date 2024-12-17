@@ -1,4 +1,6 @@
 import { authService } from './auth.js';
+import * as serverRequests from "./serverRequests.js" 
+import { BoardUtils } from './board_utils.js';
 
 window.Views = (function() {
 
@@ -47,62 +49,112 @@ window.Views = (function() {
         constructor() {
             super();
             this.setTitle("Ranking");
+            this.currentRankingType = 'local'; // Default to local ranking
         }
     
         async getHtml() {
             return await window.TemplateLoader.loadTemplate("ranking");
         }
     
+        addRankingSelector() {
+            const table = document.querySelector('.ranking-table');
+            if (!table) return;
+    
+            // Create selector container
+            const selectorContainer = document.createElement('div');
+            selectorContainer.className = 'ranking-selector';
+            selectorContainer.style.cssText = 'margin-bottom: 20px; text-align: center;';
+    
+            // Create select element
+            const selector = document.createElement('select');
+            selector.style.cssText = 'padding: 8px 16px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px;';
+            selector.innerHTML = `
+                <option value="local">Local Ranking</option>
+                <option value="online">Online Ranking</option>
+            `;
+    
+            // Add event listener
+            selector.addEventListener('change', (e) => {
+                this.currentRankingType = e.target.value;
+                if (this.currentRankingType === 'local') {
+                    this.loadRankings();
+                } else {
+                    this.loadOnlineRankings();
+                }
+            });
+    
+            selectorContainer.appendChild(selector);
+            table.parentNode.insertBefore(selectorContainer, table);
+        }
+    
         loadRankings() {
             try {
                 const rankings = JSON.parse(localStorage.getItem('gameRankings')) || [];
-                const tbody = document.querySelector('.ranking-table tbody');
-                
-                if (!tbody) {
-                    console.error("Ranking table not found");
-                    return;
-                }
-    
-                if (rankings.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" style="text-align: center;">No games played yet</td>
-                        </tr>
-                    `;
-                    return;
-                }
-    
-                tbody.innerHTML = ''; // Clear existing rows
-                
-                rankings.forEach((ranking, index) => {
-                    const row = `
-                        <tr>
-                            <td><span class="rank rank-${index + 1}">${index + 1}</span></td>
-                            <td>${ranking.winner}</td>
-                            <td>${ranking.piecesLeft}</td>
-                            <td>${ranking.gameMode}</td>
-                            <td>${ranking.aiDifficulty}</td>
-                            <td>${ranking.score}</td>
-                        </tr>
-                    `;
-                    tbody.innerHTML += row;
-                });
+                this.updateTable(rankings);
             } catch (error) {
-                console.error("Error loading rankings:", error);
-                const tbody = document.querySelector('.ranking-table tbody');
-                if (tbody) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" style="text-align: center;">Error loading rankings</td>
-                        </tr>
-                    `;
-                }
+                this.handleError("Error loading rankings:", error);
+            }
+        }
+    
+        loadOnlineRankings() {
+            try {
+                // Placeholder for online rankings
+                // Replace this with your online rankings implementation
+                const onlineRankings = []; // This should be replaced with actual online data
+                this.updateTable(onlineRankings);
+            } catch (error) {
+                this.handleError("Error loading online rankings:", error);
+            }
+        }
+    
+        updateTable(rankings) {
+            const tbody = document.querySelector('.ranking-table tbody');
+            if (!tbody) {
+                console.error("Ranking table not found");
+                return;
+            }
+    
+            if (rankings.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No games played yet</td>
+                    </tr>
+                `;
+                return;
+            }
+    
+            tbody.innerHTML = ''; // Clear existing rows
+            rankings.forEach((ranking, index) => {
+                const row = `
+                    <tr>
+                        <td><span class="rank rank-${index + 1}">${index + 1}</span></td>
+                        <td>${ranking.winner}</td>
+                        <td>${ranking.piecesLeft}</td>
+                        <td>${ranking.gameMode}</td>
+                        <td>${ranking.aiDifficulty}</td>
+                        <td>${ranking.score}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+    
+        handleError(message, error) {
+            console.error(message, error);
+            const tbody = document.querySelector('.ranking-table tbody');
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">Error loading rankings</td>
+                    </tr>
+                `;
             }
         }
     
         initialize() {
             window.addSPABackButton.addBackButtonListener.call(this);
-            this.loadRankings();
+            this.addRankingSelector();
+            this.loadRankings(); // Load local rankings by default
         }
     }
 
@@ -200,6 +252,8 @@ window.Views = (function() {
                         boardSize: document.getElementById("boardSize").value,
                         firstPlayer: document.getElementById("firstPlayer").value,
                     };
+                    localStorage.setItem("boardSize", document.getElementById("boardSize").value )
+                    console.log(localStorage.getItem("boardSize"))
 
                     // Store settings in sessionStorage
                     sessionStorage.setItem("gameSettings", JSON.stringify(gameSettings));
@@ -208,7 +262,7 @@ window.Views = (function() {
 
                     if (gameSettings.gameMode === "pvpo"){
                         try {
-                            const gameCode = await requests.requestJoin(GROUP, NICKNAME, PASSWORD, gameSettings.boardSize);
+                            const gameCode = await serverRequests.requestJoin(GROUP, NICKNAME, PASSWORD, gameSettings.boardSize);
                             sessionStorage.setItem("game", gameCode.game)
                             console.log("Entrei no jogo online");
                             window.Router.navigateTo("#game-online");
@@ -289,6 +343,33 @@ window.Views = (function() {
         }
         async initialize() {
             try {
+                const boardUtils = new BoardUtils(serverRequests, NICKNAME, PASSWORD, null, null);
+                console.log(localStorage.getItem("boardSize"))
+                boardUtils.createSquares(localStorage.getItem("boardSize"))
+                boardUtils.game_info = sessionStorage.getItem("game")
+
+                const processCollectedData = serverRequests.processDataPeriodically((data) => {
+                    boardUtils.redrawBoard(data.board);
+                    if(data.turn != boardUtils.login){
+                        console.log("sai aq")
+                        console.log(data.turn, boardUtils.login)
+                        return;  
+                    }
+                    boardUtils.removeGlowEffect();
+                    console.log("Processed data:", data.board);
+                    boardUtils.data = data;
+                    if(data.phase == "move" || data.step == "from"){
+                        addColorToOwnPieces(data)
+                        console.log("estive aq")
+                    }
+                    else if(data.phase == "move" || data.step == "to"){
+                        addColorToNeighbors(data);
+                        console.log("estive aq tbm")
+                    }
+                    else if(data.phase == "move" || data.step == "take"){
+                        
+                    }
+                });
                 const boardElement = document.getElementById("board");
                 if (!boardElement) {
                     console.error("Board element not found");
@@ -314,19 +395,12 @@ window.Views = (function() {
                     exitBtn.addEventListener("click", async (e) => {
                         e.preventDefault();
                         sessionStorage.removeItem("gameSettings");
-                        requests.requestLeave(NICKNAME, PASSWORD, game);
+                        serverRequests.requestLeave(NICKNAME, PASSWORD, game);
                         sessionStorage.removeItem("game");
                         window.Router.navigateTo("#");
                     });
                 }
 
-                // Initial game start
-                if (typeof window.Board.run_game === "function") {
-                    await window.Board.run_game(gameSettings);
-    
-                } else {
-                    console.error("run_game function not found in board module");
-                }
             } catch (error) {
                 console.error("Error initializing game:", error);
             }

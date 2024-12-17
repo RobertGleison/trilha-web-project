@@ -59,7 +59,14 @@ export class BoardUtils{
         });
     }
     createSquares(n) {
-        const board = document.getElementById('board');
+        // Check if the 'board' element exists
+        let board = document.getElementById('board');
+
+        // If it doesn't exist, create it
+        if (!board) {
+            board = document.createElement('div'); // Create a new div element
+            document.body.appendChild(board); // Append it to the body
+        }
         const initialSize = 125;
         const sizeIncrement = 125;
     

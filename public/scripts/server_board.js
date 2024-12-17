@@ -40,8 +40,6 @@ function addColorToNeighbors(data){
             }            
         });
 }
-const boardUtils = new BoardUtils(serverRequests, login, senha, null, null);
-boardUtils.createSquares(game_size)
 const processCollectedData = serverRequests.processDataPeriodically((data) => {
     boardUtils.redrawBoard(data.board);
     if(data.turn != boardUtils.login){
