@@ -49,7 +49,8 @@ window.Views = (function() {
         constructor() {
             super();
             this.setTitle("Ranking");
-            this.currentRankingType = 'local'; // Default to local ranking
+            this.currentRankingType = 'local';
+            this.boardSizeTemp = 2; // Default board size
         }
     
         async getHtml() {
@@ -65,25 +66,45 @@ window.Views = (function() {
             selectorContainer.className = 'ranking-selector';
             selectorContainer.style.cssText = 'margin-bottom: 20px; text-align: center;';
     
-            // Create select element
-            const selector = document.createElement('select');
-            selector.style.cssText = 'padding: 8px 16px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px;';
-            selector.innerHTML = `
+            // Create ranking type selector
+            const rankingSelector = document.createElement('select');
+            rankingSelector.style.cssText = 'padding: 8px 16px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px; margin-right: 10px;';
+            rankingSelector.innerHTML = `
                 <option value="local">Local Ranking</option>
                 <option value="online">Online Ranking</option>
             `;
     
-            // Add event listener
-            selector.addEventListener('change', (e) => {
+            // Create board size selector (initially hidden)
+            const boardSizeSelector = document.createElement('select');
+            boardSizeSelector.style.cssText = 'padding: 8px 16px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px; display: none;';
+            boardSizeSelector.innerHTML = `
+                <option value="2">Board Size 2</option>
+                <option value="3">Board Size 3</option>
+                <option value="4">Board Size 4</option>
+            `;
+    
+            // Add event listener for ranking type
+            rankingSelector.addEventListener('change', (e) => {
                 this.currentRankingType = e.target.value;
                 if (this.currentRankingType === 'local') {
+                    boardSizeSelector.style.display = 'none';
                     this.loadRankings();
                 } else {
+                    boardSizeSelector.style.display = 'inline-block';
                     this.loadOnlineRankings();
                 }
             });
     
-            selectorContainer.appendChild(selector);
+            // Add event listener for board size
+            boardSizeSelector.addEventListener('change', (e) => {
+                this.boardSizeTemp = parseInt(e.target.value);
+                if (this.currentRankingType === 'online') {
+                    this.loadOnlineRankings();
+                }
+            });
+    
+            selectorContainer.appendChild(rankingSelector);
+            selectorContainer.appendChild(boardSizeSelector);
             table.parentNode.insertBefore(selectorContainer, table);
         }
     
@@ -98,9 +119,7 @@ window.Views = (function() {
     
         loadOnlineRankings() {
             try {
-                // Placeholder for online rankings
-                // Replace this with your online rankings implementation
-                const onlineRankings = []; // This should be replaced with actual online data
+                const onlineRankings = serverRequests.requestRanking(GROUP, this.boardSizeTemp);
                 this.updateTable(onlineRankings);
             } catch (error) {
                 this.handleError("Error loading online rankings:", error);

@@ -89,6 +89,7 @@ async function teste_singleplayer() {
     }
    
 }
+
 async function multiplayer(){
     try {
         await serverRequests.requestRegister(login, senha); 

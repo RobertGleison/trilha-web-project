@@ -404,7 +404,9 @@ function loadRankings() {
         `;
         tbody.innerHTML += row;
     });
-}function gameOver(winner) {
+}
+
+function gameOver(winner) {
     console.log("Game Over");
     
     // Save game info to ranking
