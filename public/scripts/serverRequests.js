@@ -1,33 +1,11 @@
 //import {boardUtils} from "./board_utils.js"
 /*Teste para o envio de pacotes ao servidor, async para nao ficar feio */
 
-/*----------------------------------------------------------------------------------------
-Função para registrar e logar um usuario, recebe o nickname do usuario e sua respectiva senha*/ 
-export async function requestRegister(nick, password){
-    try{
-    const response = await fetch('http://twserver.alunos.dcc.fc.up.pt:8008/register', {
-        method: 'POST',
-        body: JSON.stringify({nick, password})
-    })
-    } catch (error) {
-    alert(`Network error: ${error.message}`);
-    console.error('Network error:', error);
-    }
-    /* para testar o sucesso de envio
-    if(response.ok){
-        alert("Success")
-    }
-    else{
-        alert("Error, bad request")
-    }
-    */
-}
-/*-----------------------------------------------------------------------------------------
-Debugging feito*/ 
+
 
 /*----------------------------------------------------------------------------------------
 Função para se juntar a um jogo/ para criar uma sala para o jogo*/ 
-export async function requestJoin(group, nick, password, size) {
+async function requestJoin(group, nick, password, size) {
     try {
         const response = await fetch('http://twserver.alunos.dcc.fc.up.pt:8008/join', {
             method: 'POST',
@@ -69,7 +47,7 @@ Debugging nao feito*/
 
 /*----------------------------------------------------------------------------------------
 Função para enviar ao servidor uma jogada*/ 
-export async function requestNotify(nick, password, game, square, position) {
+async function requestNotify(nick, password, game, square, position) {
     const cell = { square, position };
     
     try {
@@ -94,7 +72,7 @@ Debugging nao feito*/
 
 /*----------------------------------------------------------------------------------------
 Função para autualizar o tabuleiro do jogo*/ 
-export async function requestUpdate(game, nick, callback) {
+async function requestUpdate(game, nick, callback) {
     const params = new URLSearchParams({ game, nick });
     const url = `http://twserver.alunos.dcc.fc.up.pt:8008/update?${params.toString()}`;
 
@@ -122,7 +100,7 @@ export async function requestUpdate(game, nick, callback) {
     }
 }
 
-export function processDataPeriodically(callback) {
+function processDataPeriodically(callback) {
     let latestData = null; // Armazena apenas o último pacote
 
     setInterval(() => {
@@ -143,7 +121,7 @@ Debugging feito, no caso de nao existir o jogo o codigo funciona*/
 
 /*----------------------------------------------------------------------------------------
 Função retorna a tabela de classificação com os top 10 jogadores*/ 
-export async function requestRanking(group, size) {
+async function requestRanking(group, size) {
     try {
         const response = await fetch('http://twserver.alunos.dcc.fc.up.pt:8008/ranking', {
             method: 'POST',
@@ -169,6 +147,18 @@ export async function requestRanking(group, size) {
         return null;
     }
 }
+
+
+
+export {
+    requestJoin,
+    requestLeave,
+    requestNotify,
+    requestUpdate,
+    processDataPeriodically,
+    requestRanking
+};
+
 /*-----------------------------------------------------------------------------------------
 Debugging feito*/
 

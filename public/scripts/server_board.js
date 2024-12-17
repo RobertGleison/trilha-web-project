@@ -6,8 +6,8 @@ import {BoardUtils} from "./board_utils.js"
  * Essas variaveis tem que ser integradas com as opçoes do jogo na pagina anterior
  */ 
 const game_size = 3
-const login = "Roxy!"
-const senha = "mizumajutsushi"
+const login = "Eris!"
+const senha = "eriswasekainoichibankirei"
 /**
  * -----------------------------------------------------------------------------
  */
@@ -41,22 +41,24 @@ function addColorToNeighbors(data){
         });
 }
 const boardUtils = new BoardUtils(serverRequests, login, senha, null, null);
-// boardUtils.createSquares(game_size)
-
+boardUtils.createSquares(game_size)
 const processCollectedData = serverRequests.processDataPeriodically((data) => {
-    boardUtils.removeGlowEffect();
-    data.board = boardUtils.convertBoardFormat(data.board)
     boardUtils.redrawBoard(data.board);
     if(data.turn != boardUtils.login){
+        console.log("sai aq")
+        console.log(data.turn, boardUtils.login)
         return;  
     }
+    boardUtils.removeGlowEffect();
     console.log("Processed data:", data.board);
     boardUtils.data = data;
     if(data.phase == "move" || data.step == "from"){
         addColorToOwnPieces(data)
+        console.log("estive aq")
     }
     else if(data.phase == "move" || data.step == "to"){
         addColorToNeighbors(data);
+        console.log("estive aq tbm")
     }
     else if(data.phase == "move" || data.step == "take"){
         
@@ -89,7 +91,7 @@ async function teste_singleplayer() {
     }
    
 }
-async function teste_multiplayer(){
+async function multiplayer(){
     try {
         await serverRequests.requestRegister(login, senha); 
         const game_info = await serverRequests.requestJoin(24,login, senha, game_size); 
@@ -103,5 +105,4 @@ async function teste_multiplayer(){
     }
 }
 //teste_singleplayer()
-teste_multiplayer()
-
+// multiplayer()

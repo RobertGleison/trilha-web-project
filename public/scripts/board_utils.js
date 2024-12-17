@@ -24,11 +24,7 @@ export class BoardUtils{
        do board usado na logica do jogo no board*/
     convertBoardFormat(serverboard){
         const newboard = serverboard
-        let temp = null
         for(let i = 0;i < serverboard.length; i++){
-            newboard[i][0] = serverboard[i][0]
-            newboard[i][1] = serverboard[i][1]
-            newboard[i][2] = serverboard[i][2]
             newboard[i][3] = serverboard[i][7]
             newboard[i][4] = serverboard[i][3]
             newboard[i][5] = serverboard[i][6]
@@ -63,11 +59,7 @@ export class BoardUtils{
         });
     }
     createSquares(n) {
-        console.log("Estou no createSquares");
         const board = document.getElementById('board');
-        if (board !== null) console.log("board n é nulo");
-        // const board = document.getElementsByClassName('board');
-
         const initialSize = 125;
         const sizeIncrement = 125;
     
@@ -98,13 +90,12 @@ export class BoardUtils{
             createButton(i, 0, 0, '1'); // Top-left corner
             createButton(i, halfSize, 0, '2'); // Top-center
             createButton(i, size, 0, '3'); // Top-right corner
-            createButton(i, 0, halfSize, '4'); // Left-center
-            createButton(i, size, halfSize, '5'); // Right-center
-            createButton(i, 0, size, '6'); // Bottom-left corner
-            createButton(i, halfSize, size, '7'); // Bottom-center
-            createButton(i, size, size, '8'); // Bottom-right corner
+            createButton(i, size, halfSize, '4'); // Right-center
+            createButton(i, size, size, '5'); // Bottom-right corner
+            createButton(i, halfSize, size, '6'); // Bottom-center
+            createButton(i, 0, size, '7'); // Bottom-left corner
+            createButton(i, 0, halfSize, '8'); // Left-center
     
-            if (square !== null) console.log("html square n é nulo");
             board.appendChild(square);
             //game_list.push(Array(8).fill('empty'));
         }
@@ -115,21 +106,18 @@ export class BoardUtils{
             console.log("Tile clicked:", event.target.id);
             const id= event.target.id.split('').map(Number);
             console.log(this.game_info)
-            id[1] = this.convertSingleButton(id[1])
             this.serverRequests.requestNotify(this.login, this.senha, String(this.game_info), id[0]-1, id[1]-1)
         }
         else if(this.data.phase == "move"){
             console.log("Tile clicked:", event.target.id);
             const id= event.target.id.split('').map(Number);
             console.log(this.game_info)
-            id[1] = this.convertSingleButton(id[1])
             this.serverRequests.requestNotify(this.login, this.senha, String(this.game_info), id[0]-1, id[1]-1)
         }
         else if(this.data.phase == "remove"){
             console.log("Tile clicked:", event.target.id);
             const id= event.target.id.split('').map(Number);
             console.log(this.game_info)
-            id[1] = this.convertSingleButton(id[1])
             this.serverRequests.requestNotify(this.login, this.senha, String(this.game_info), id[0]-1, id[1]-1)
         }
     }

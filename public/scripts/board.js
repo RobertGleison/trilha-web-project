@@ -387,7 +387,7 @@ function selectTile(event) { //faz a logica de um clique, maioria da logica do j
 
 
 function loadRankings() {
-    const rankings = JSON.parse(sessionStorage.getItem('gameRankings')) || [];
+    const rankings = JSON.parse(localStorage.getItem('gameRankings')) || [];
     const tbody = document.querySelector('.ranking-table tbody');
     tbody.innerHTML = ''; // Clear existing rows
     
@@ -422,8 +422,8 @@ function loadRankings() {
         score: score()
     };
 
-    // Get existing rankings from sessionStorage or initialize empty array
-    let rankings = JSON.parse(sessionStorage.getItem('gameRankings')) || [];
+    // Get existing rankings from localStorage or initialize empty array
+    let rankings = JSON.parse(localStorage.getItem('gameRankings')) || [];
     
     // Add new ranking
     rankings.push(gameResult);
@@ -434,8 +434,8 @@ function loadRankings() {
     // Keep only top 5 rankings
     rankings = rankings.slice(0, 5);
     
-    // Save to sessionStorage
-    sessionStorage.setItem('gameRankings', JSON.stringify(rankings));
+    // Save to localStorage
+    localStorage.setItem('gameRankings', JSON.stringify(rankings));
     
     // Rest of your modal code...
     const modal = document.createElement('div');

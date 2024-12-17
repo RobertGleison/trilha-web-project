@@ -1,6 +1,7 @@
 const API_URL = 'http://twserver.alunos.dcc.fc.up.pt:8008';
 
-const authService = {
+
+export const authService = {
     // Local storage management
     isAuthenticated() {
         return sessionStorage.getItem('isAuthenticated') === 'true';
@@ -44,4 +45,4 @@ const authService = {
     }
 };
 
-export {authService}
+window.authService = authService;
