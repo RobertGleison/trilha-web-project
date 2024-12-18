@@ -57,7 +57,7 @@ window.Views = (function() {
         async getHtml() {
             // Load the appropriate template based on ranking type
             const templateName = this.currentRankingType === 'local' ? 'ranking' : 'ranking-online';
-
+            console.log("What did you say")
             return await window.TemplateLoader.loadTemplate(templateName);
         }
     
@@ -115,11 +115,31 @@ window.Views = (function() {
         loadRankings() {
             try {
                 const rankings = JSON.parse(localStorage.getItem('gameRankings')) || [];
+                
+                // Ensure headers are fixed for local rankings
+                this.updateTableHeaders(['Rank', 'Player', 'Pieces Left', 'Game Mode', 'AI Difficulty', 'Score']);
+                
                 this.updateTable(rankings);
             } catch (error) {
                 this.handleError("Error loading rankings:", error);
             }
         }
+        
+        updateTableHeaders(headers) {
+            const headerRow = document.querySelector('.ranking-table thead tr');
+            if (headerRow) {
+                // Clear the current header row
+                headerRow.innerHTML = '';
+                
+                // Add the new headers dynamically
+                headers.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.innerText = headerText;
+                    headerRow.appendChild(th);
+                });
+            }
+        }
+        
     
         async loadOnlineRankings() {
             try {
@@ -174,6 +194,9 @@ window.Views = (function() {
                     rankings = rankings.slice(0, 10); // Keep top 10 rankings
                 }
         
+                // Change the headers to 'Games' and 'Victories'
+                this.updateTableHeaders(['Rank', 'Player', 'Games', 'Victories']);
+        
                 this.updateOnlineTable(rankings);
         
             } catch (error) {
@@ -181,6 +204,22 @@ window.Views = (function() {
                 this.handleError("Error loading online rankings:", error);
             }
         }
+        
+        updateTableHeaders(headers) {
+            const headerRow = document.querySelector('.ranking-table thead tr');
+            if (headerRow) {
+                // Clear the current header row
+                headerRow.innerHTML = '';
+                
+                // Add the new headers dynamically
+                headers.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.innerText = headerText;
+                    headerRow.appendChild(th);
+                });
+            }
+        }
+        
         
         handleError(message, error) {
             console.error(message, error);
