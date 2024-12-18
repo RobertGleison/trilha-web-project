@@ -45,6 +45,7 @@ const processCollectedData = serverRequests.processDataPeriodically((data) => {
     if(data.turn != boardUtils.login){
         console.log("sai aq")
         console.log(data.turn, boardUtils.login)
+        boardUtils.removeGlowEffect();
         return;  
     }
     boardUtils.removeGlowEffect();
@@ -89,7 +90,6 @@ async function teste_singleplayer() {
     }
    
 }
-
 async function multiplayer(){
     try {
         await serverRequests.requestRegister(login, senha); 

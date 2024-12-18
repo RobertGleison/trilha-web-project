@@ -1,3 +1,4 @@
+
 import { authService } from './auth.js';
 import * as serverRequests from "./serverRequests.js" 
 import { BoardUtils } from './board_utils.js';
@@ -54,7 +55,10 @@ window.Views = (function() {
         }
     
         async getHtml() {
-            return await window.TemplateLoader.loadTemplate("ranking");
+            // Load the appropriate template based on ranking type
+            const templateName = this.currentRankingType === 'local' ? 'ranking' : 'ranking-online';
+
+            return await window.TemplateLoader.loadTemplate(templateName);
         }
     
         async addRankingSelector() {
@@ -119,22 +123,110 @@ window.Views = (function() {
     
         async loadOnlineRankings() {
             try {
-                const onlineRankings = await serverRequests.requestRanking(GROUP, this.boardSizeTemp);
-                console.log("online rankings:" + onlineRankings)
-                console.log("online nick:" + onlineRankings.nick)
-                console.log("online games:" + onlineRankings.games)
-                console.log("online victories:" + onlineRankings.victories)
-                console.log(JSON.stringify(onlineRankings))
-                const rankings = JSON.stringify(onlineRankings)
-
-                response.ranking.sort((a, b) => b.victories - a.victories);
-                rankings = rankings.slice(0, 10);
-                updateOnlineTable(rankings)
-
-
+                const response = await serverRequests.requestRanking(GROUP, this.boardSizeTemp);
+                console.log("Raw response:", response);
+                
+                if (!response) {
+                    throw new Error("No response received from server");
+                }
+        
+                // Handle the response based on its structure
+                let rankings;
+                if (response.ranking) {
+                    // If response has a ranking property
+                    rankings = Array.isArray(response.ranking) ? response.ranking : [response.ranking];
+                } else if (Array.isArray(response)) {
+                    // If response is directly an array
+                    rankings = response;
+                } else if (typeof response === 'object') {
+                    // If response is a single ranking object
+                    rankings = [response];
+                } else {
+                    try {
+                        // Try parsing if it's a JSON string
+                        const parsed = JSON.parse(response);
+                        rankings = Array.isArray(parsed) ? parsed : [parsed];
+                    } catch (e) {
+                        console.error("Failed to parse response:", e);
+                        throw new Error("Invalid response format");
+                    }
+                }
+        
+                console.log("Processed rankings:", rankings);
+        
+                // Validate the rankings data structure
+                rankings = rankings.filter(ranking => 
+                    ranking && 
+                    typeof ranking.nick !== 'undefined' && 
+                    typeof ranking.games !== 'undefined' && 
+                    typeof ranking.victories !== 'undefined'
+                );
+        
+                if (rankings.length === 0) {
+                    console.log("No valid rankings found");
+                    this.updateOnlineTable([]);
+                    return;
+                }
+        
+                // Sort by victories if multiple entries exist
+                if (rankings.length > 1) {
+                    rankings.sort((a, b) => b.victories - a.victories);
+                    rankings = rankings.slice(0, 10); // Keep top 10 rankings
+                }
+        
+                this.updateOnlineTable(rankings);
+        
             } catch (error) {
+                console.error("Error in loadOnlineRankings:", error);
                 this.handleError("Error loading online rankings:", error);
             }
+        }
+        
+        handleError(message, error) {
+            console.error(message, error);
+            const tbody = document.querySelector('.ranking-table tbody');
+            if (tbody) {
+                // Use colspan 4 for online ranking table as it has 4 columns
+                const colspan = this.currentRankingType === 'local' ? 6 : 4;
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="${colspan}" style="text-align: center;">Error loading rankings</td>
+                    </tr>
+                `;
+            }
+        }
+        
+        updateOnlineTable(rankings) {
+            // Get the correct table body for online rankings
+            const tbody = document.querySelector('.ranking-table tbody');
+            if (!tbody) {
+                console.error("Ranking table not found");
+                return;
+            }
+        
+            if (!rankings || rankings.length === 0) {
+                // Use colspan 4 for online ranking table
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center;">No online rankings available</td>
+                    </tr>
+                `;
+                return;
+            }
+        
+            tbody.innerHTML = ''; // Clear existing rows
+            rankings.forEach((ranking, index) => {
+                console.log("Processing online ranking row:", ranking);
+                const row = `
+                    <tr>
+                        <td><span class="rank rank-${index + 1}">${index + 1}</span></td>
+                        <td>${ranking.nick || 'Unknown'}</td>
+                        <td>${typeof ranking.games !== 'undefined' ? ranking.games : 0}</td>
+                        <td>${typeof ranking.victories !== 'undefined' ? ranking.victories : 0}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
         }
     
         updateTable(rankings) {
@@ -167,48 +259,6 @@ window.Views = (function() {
                 `;
                 tbody.innerHTML += row;
             });
-        }
-
-        updateTable(rankings) {
-            const tbody = document.querySelector('.ranking-table tbody');
-            if (!tbody) {
-                console.error("Ranking table not found");
-                return;
-            }
-    
-            if (rankings.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" style="text-align: center;">No games played yet</td>
-                    </tr>
-                `;
-                return;
-            }
-    
-            tbody.innerHTML = ''; // Clear existing rows
-            rankings.forEach((ranking, index) => {
-                const row = `
-                    <tr>
-                        <td><span class="rank rank-${index + 1}">${index + 1}</span></td>
-                        <td>${ranking.nick}</td>
-                        <td>${ranking.games}</td>
-                        <td>${ranking.victories}</td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
-            });
-        }
-    
-        handleError(message, error) {
-            console.error(message, error);
-            const tbody = document.querySelector('.ranking-table tbody');
-            if (tbody) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" style="text-align: center;">Error loading rankings</td>
-                    </tr>
-                `;
-            }
         }
     
         initialize() {
@@ -403,6 +453,18 @@ window.Views = (function() {
         }
         async initialize() {
             try {
+
+                const exitBtn = document.getElementById("exit-btn");
+                if (exitBtn) {
+                    exitBtn.addEventListener("click", async (e) => {
+                        e.preventDefault();
+                        sessionStorage.removeItem("gameSettings");
+                        serverRequests.requestLeave(NICKNAME, PASSWORD, sessionStorage.getItem("game"));
+                        sessionStorage.removeItem("game");
+                        window.Router.navigateTo("#");
+                    });
+                }
+
                 const boardUtils = new BoardUtils(serverRequests, NICKNAME, PASSWORD, null, null);
                 console.log(localStorage.getItem("boardSize"))
                 boardUtils.createSquares(localStorage.getItem("boardSize"))
@@ -410,20 +472,46 @@ window.Views = (function() {
 
                 const processCollectedData = serverRequests.processDataPeriodically((data) => {
                     boardUtils.redrawBoard(data.board);
+                    boardUtils.removeGlowEffect();
+                    console.log("Processed data:", data.board);
+                    let currentPlayerElement = document.getElementById("current-player");
+                    let currentPlayerMessage = document.getElementById("game-message");
+                    let playerColor = data.players[NICKNAME] || null;
+                    if(data.winner != undefined){
+                        console.log('Roxy')
+                        boardUtils.gameOver(data.winner)
+                    }
+                    if(data.turn == boardUtils.login){
+                        if(playerColor == `blue`){
+                           playerColor = `black`
+                        }
+                        
+                        currentPlayerElement.textContent = "Your turn to play";
+                        currentPlayerMessage.textContent = `Game in progress - ${playerColor}s turn`
+                    }
+                    else{
+                        let opponentColor = null
+                        if(playerColor == `blue`){
+                            opponentColor = `red`
+                        }
+                        else{
+                            opponentColor = `black`
+                        }
+                        currentPlayerElement.textContent = "Opponents turn to play";
+                        currentPlayerMessage.textContent = `Game in progress - ${opponentColor}s turn`
+                    }
                     if(data.turn != boardUtils.login){
                         console.log("sai aq")
                         console.log(data.turn, boardUtils.login)
                         return;  
                     }
-                    boardUtils.removeGlowEffect();
-                    console.log("Processed data:", data.board);
                     boardUtils.data = data;
                     if(data.phase == "move" || data.step == "from"){
-                        addColorToOwnPieces(data)
+                        //addColorToOwnPieces(data)
                         console.log("estive aq")
                     }
                     else if(data.phase == "move" || data.step == "to"){
-                        addColorToNeighbors(data);
+                        //addColorToNeighbors(data);
                         console.log("estive aq tbm")
                     }
                     else if(data.phase == "move" || data.step == "take"){
@@ -436,7 +524,7 @@ window.Views = (function() {
                     return;
                 }
 
-                const game = sessionStorage.getItem("game")
+                
 
                 // Get game settings from sessionStorage
                 const gameSettings = JSON.parse(
@@ -450,16 +538,6 @@ window.Views = (function() {
                 )
 
                 // Add event listeners
-                const exitBtn = document.getElementById("exit-btn");
-                if (exitBtn) {
-                    exitBtn.addEventListener("click", async (e) => {
-                        e.preventDefault();
-                        sessionStorage.removeItem("gameSettings");
-                        serverRequests.requestLeave(NICKNAME, PASSWORD, game);
-                        sessionStorage.removeItem("game");
-                        window.Router.navigateTo("#");
-                    });
-                }
 
             } catch (error) {
                 console.error("Error initializing game:", error);
@@ -694,7 +772,7 @@ window.TemplateLoader = {
                 <thead>
                     <tr>
                     <th>Rank</th>
-                    <th>Winner</th>
+                    <th>Player</th>
                     <th>Pieces Left</th>
                     <th>Game Mode</th>
                     <th>AI Difficulty</th>
@@ -711,17 +789,7 @@ window.TemplateLoader = {
             </div>
 
         `,
-        "login": `
-        <div class="auth-container">
-            <h1>Nine Men's Morris</h1>
-            <form id="authForm" class="auth-form">
-                <input type="text" id="username" placeholder="Username" required />
-                <input type="password" id="password" placeholder="Password" required />
-                <button type="submit" class="login-button">Login</button>
-            </form>
-        </div>
-    `,
-    "ranking-online": `
+        "ranking-online": `
         <div class="content-container">
             <h2 class="content-title">Game History</h2>
 
@@ -730,7 +798,7 @@ window.TemplateLoader = {
                 <thead>
                     <tr>
                     <th>Rank</th>
-                    <th>Nick</th>
+                    <th>Player</th>
                     <th>Games</th>
                     <th>Victories</th>
                     </tr>
