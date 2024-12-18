@@ -57,7 +57,7 @@ window.Views = (function() {
             return await window.TemplateLoader.loadTemplate("ranking");
         }
     
-        addRankingSelector() {
+        async addRankingSelector() {
             const table = document.querySelector('.ranking-table');
             if (!table) return;
     
@@ -117,10 +117,21 @@ window.Views = (function() {
             }
         }
     
-        loadOnlineRankings() {
+        async loadOnlineRankings() {
             try {
-                const onlineRankings = serverRequests.requestRanking(GROUP, this.boardSizeTemp);
-                this.updateTable(onlineRankings);
+                const onlineRankings = await serverRequests.requestRanking(GROUP, this.boardSizeTemp);
+                console.log("online rankings:" + onlineRankings)
+                console.log("online nick:" + onlineRankings.nick)
+                console.log("online games:" + onlineRankings.games)
+                console.log("online victories:" + onlineRankings.victories)
+                console.log(JSON.stringify(onlineRankings))
+                const rankings = JSON.stringify(onlineRankings)
+
+                response.ranking.sort((a, b) => b.victories - a.victories);
+                rankings = rankings.slice(0, 10);
+                updateOnlineTable(rankings)
+
+
             } catch (error) {
                 this.handleError("Error loading online rankings:", error);
             }
@@ -152,6 +163,36 @@ window.Views = (function() {
                         <td>${ranking.gameMode}</td>
                         <td>${ranking.aiDifficulty}</td>
                         <td>${ranking.score}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        updateTable(rankings) {
+            const tbody = document.querySelector('.ranking-table tbody');
+            if (!tbody) {
+                console.error("Ranking table not found");
+                return;
+            }
+    
+            if (rankings.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No games played yet</td>
+                    </tr>
+                `;
+                return;
+            }
+    
+            tbody.innerHTML = ''; // Clear existing rows
+            rankings.forEach((ranking, index) => {
+                const row = `
+                    <tr>
+                        <td><span class="rank rank-${index + 1}">${index + 1}</span></td>
+                        <td>${ranking.nick}</td>
+                        <td>${ranking.games}</td>
+                        <td>${ranking.victories}</td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
@@ -658,6 +699,40 @@ window.TemplateLoader = {
                     <th>Game Mode</th>
                     <th>AI Difficulty</th>
                     <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+                </table>
+            </div>
+            <div class="button-group">
+                <button type="button" id="backBtn">Back</button>
+            </div>
+            </div>
+
+        `,
+        "login": `
+        <div class="auth-container">
+            <h1>Nine Men's Morris</h1>
+            <form id="authForm" class="auth-form">
+                <input type="text" id="username" placeholder="Username" required />
+                <input type="password" id="password" placeholder="Password" required />
+                <button type="submit" class="login-button">Login</button>
+            </form>
+        </div>
+    `,
+    "ranking-online": `
+        <div class="content-container">
+            <h2 class="content-title">Game History</h2>
+
+            <div class="ranking-container">
+                <table class="ranking-table">
+                <thead>
+                    <tr>
+                    <th>Rank</th>
+                    <th>Nick</th>
+                    <th>Games</th>
+                    <th>Victories</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -133,7 +133,6 @@ async function requestRanking(group, size) {
 
         if (response.ok) {
             const data = await response.json(); // Parse the JSON response
-            alert("Success");
             return data; // Return the parsed response
         } else {
             const errorText = await response.text(); // Read the error response
